@@ -1,0 +1,30 @@
+import { useAppStore } from '@/store/app-store'
+
+interface TopNavProps {
+  title: string
+  action?: { label: string; onClick: () => void }
+}
+
+export function TopNav({ title, action }: TopNavProps) {
+  const setScreen = useAppStore((s) => s.setScreen)
+
+  return (
+    <div className="bg-card-bg px-5 pt-3.5 pb-3 border-b border-border flex items-center gap-2.5 shrink-0">
+      <button
+        onClick={() => setScreen('home', 'home')}
+        className="w-[34px] h-[34px] rounded-full bg-surface border-none flex items-center justify-center text-lg cursor-pointer text-forest shrink-0"
+      >
+        ‹
+      </button>
+      <div className="font-serif text-[17px] text-forest flex-1">{title}</div>
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="text-[13px] font-semibold text-leaf border-none bg-transparent cursor-pointer p-0"
+        >
+          {action.label}
+        </button>
+      )}
+    </div>
+  )
+}

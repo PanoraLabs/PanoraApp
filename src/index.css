@@ -1,0 +1,94 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+
+  /* Panora design tokens */
+  --color-forest: #0D2B1A;
+  --color-moss: #1A5C38;
+  --color-leaf: #2E8B57;
+  --color-sprout: #5DBB7A;
+  --color-lime: #A8EFC0;
+  --color-mist: #E8F5E9;
+  --color-gold: #C8961E;
+  --color-amber: #E8A020;
+  --color-cream: #F7F4EE;
+  --color-ink: #0F1810;
+  --color-stone: #6B7B6E;
+  --color-surface: #F2EFE8;
+  --color-card-bg: #FFFDF9;
+  --color-danger: #C0392B;
+
+  --color-background: #F2EFE8;
+  --color-foreground: #0F1810;
+  --color-card: #FFFDF9;
+  --color-card-foreground: #0F1810;
+  --color-primary: #0D2B1A;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #F2EFE8;
+  --color-secondary-foreground: #0D2B1A;
+  --color-muted: #F2EFE8;
+  --color-muted-foreground: #6B7B6E;
+  --color-accent: #E8F5E9;
+  --color-accent-foreground: #0D2B1A;
+  --color-destructive: #C0392B;
+  --color-border: rgba(13, 43, 26, 0.07);
+  --color-input: rgba(13, 43, 26, 0.12);
+  --color-ring: #2E8B57;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 30% 20%, #0D2B1A 0%, #050E08 60%, #000 100%);
+  }
+
+  @media (display-mode: standalone), (display-mode: fullscreen) {
+    body {
+      align-items: flex-start;
+    }
+  }
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.live-dot {
+  animation: pulse-dot 2s infinite;
+}
