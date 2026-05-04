@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 export function PhoneFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="w-[390px] h-[844px] bg-surface rounded-[48px] overflow-hidden relative flex flex-col shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_40px_100px_rgba(0,0,0,0.7),inset_0_0_0_1px_rgba(255,255,255,0.04)] [@media(display-mode:standalone)]:w-full [@media(display-mode:standalone)]:max-w-full [@media(display-mode:standalone)]:h-dvh [@media(display-mode:standalone)]:rounded-none [@media(display-mode:standalone)]:shadow-none">
+    <div className="mx-auto flex flex-col w-full max-w-[520px] h-dvh bg-surface relative overflow-hidden md:my-6 md:h-[calc(100dvh-3rem)] md:rounded-[28px] md:shadow-[0_30px_80px_-30px_rgba(0,0,0,0.35),0_0_0_1px_rgba(0,0,0,0.04)]">
       {children}
     </div>
   )

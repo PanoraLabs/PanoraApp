@@ -1,0 +1,30 @@
+{
+  "name": "Panora — Investasi Pertanian Indonesia",
+  "short_name": "Panora",
+  "description": "Platform investasi pertanian Indonesia — danai petani, panen hasil bersama.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#F2EFE8",
+  "theme_color": "#0D2B1A",
+  "lang": "id",
+  "dir": "ltr",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ]
+}

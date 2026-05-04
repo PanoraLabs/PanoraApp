@@ -13,7 +13,10 @@ export function BottomNav() {
   const { navTab, setScreen } = useAppStore()
 
   return (
-    <div className="h-[82px] flex items-start justify-around pt-3 px-2 bg-card-bg border-t border-border shrink-0">
+    <div
+      className="flex items-start justify-around pt-3 px-2 bg-card-bg border-t border-border shrink-0"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}

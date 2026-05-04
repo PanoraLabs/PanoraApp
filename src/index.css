@@ -55,24 +55,24 @@
     @apply border-border outline-ring/50;
   }
 
-  html {
+  html, body {
     height: 100%;
     -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: none;
   }
 
   body {
     font-family: var(--font-sans);
-    min-height: 100vh;
     min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(ellipse at 30% 20%, #0D2B1A 0%, #050E08 60%, #000 100%);
+    background: var(--color-surface);
+    color: var(--color-foreground);
   }
 
-  @media (display-mode: standalone), (display-mode: fullscreen) {
+  /* On wider viewports, frame the mobile column with a subtle neutral. */
+  @media (min-width: 640px) {
     body {
-      align-items: flex-start;
+      background:
+        radial-gradient(ellipse at 50% 0%, #E8E2D2 0%, #D8D2C2 60%, #C8C2B2 100%);
     }
   }
 }
