@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { CropIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { Position } from '@/data/positions'
 
@@ -14,7 +15,7 @@ export function PositionRow({ position: p, onClick }: PositionRowProps) {
       onClick={onClick}
       className="flex items-center gap-3 p-3.5 bg-surface rounded-[14px] cursor-pointer mb-2 active:bg-forest/5 transition-colors"
     >
-      <div className="text-[22px]">{p.emoji}</div>
+      <CropIcon crop={p.crop} size="md" />
       <div className="flex-1">
         <div className="text-[13px] font-medium text-forest">{p.code}</div>
         <div className="text-[11px] text-stone mt-px">{p.sub}</div>

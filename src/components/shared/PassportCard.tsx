@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { PassportNFT } from '@/data/passport'
 
@@ -13,7 +14,7 @@ export function PassportCard({ nft, onClick }: PassportCardProps) {
       className={cn(nft.bg, 'rounded-[18px] p-[18px] relative overflow-hidden mb-3 cursor-pointer')}
     >
       <div className="absolute -top-10 -right-10 w-[130px] h-[130px] rounded-full bg-white/7" />
-      <div className="text-[10px] text-white/40 tracking-widest uppercase mb-1">cNFT · {nft.id}</div>
+      <div className="text-[10px] text-white/40 tracking-widest uppercase mb-1">Passport · {nft.id}</div>
       <div className="font-serif text-[17px] text-white mb-3">{nft.name}</div>
       <div className="grid grid-cols-2 gap-2">
         {nft.meta.map((m) => (
@@ -24,7 +25,8 @@ export function PassportCard({ nft, onClick }: PassportCardProps) {
         ))}
       </div>
       <div className="inline-flex items-center gap-1 bg-white/15 text-white/90 px-2.5 py-1 rounded-full text-[10px] font-semibold mt-2.5">
-        ✓ EUDR Compliant
+        <Check className="size-3" />
+        Origin verified
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
+import type { ActionKey } from '@/lib/icons'
+
 export interface ActivityItem {
-  icon: string
-  bg: string
+  action: ActionKey
   name: string
   sub: string
   amt: string
@@ -16,29 +17,26 @@ export interface ActivityGroup {
 
 export const recentActivity: ActivityItem[] = [
   {
-    icon: '💰',
-    bg: 'bg-gold/15',
-    name: 'Profit Claim',
-    sub: 'CACAO-FLORES-Q4-25',
+    action: 'profit',
+    name: 'Profit received',
+    sub: 'Cacao Flores · settled',
     amt: '+Rp 2.9M',
     pos: true,
     date: 'Apr 10',
   },
   {
-    icon: '📥',
-    bg: 'bg-stone/10',
-    name: 'Stake',
-    sub: 'SHALLOT-GH-BREBES-Q2',
+    action: 'invest',
+    name: 'New investment',
+    sub: 'Shallot · Brebes',
     amt: '−Rp 8M',
     pos: false,
     date: 'Apr 2',
   },
   {
-    icon: '🏆',
-    bg: 'bg-leaf/15',
-    name: 'Milestone 2',
-    sub: 'COFFEE-HYB-TORAJA',
-    amt: 'Disbursed',
+    action: 'milestone',
+    name: 'Milestone paid',
+    sub: 'Toraja Arabica · mid-season',
+    amt: 'On record',
     pos: false,
     neutral: true,
     date: 'Mar 28',
@@ -50,19 +48,17 @@ export const activityHistory: ActivityGroup[] = [
     month: 'April 2026',
     items: [
       {
-        icon: '💰',
-        bg: 'bg-gold/15',
-        name: 'Profit Claim',
-        sub: 'CACAO-FLORES-Q4-25 · tx: 5xKj...3mPq',
+        action: 'profit',
+        name: 'Profit received',
+        sub: 'Cacao Flores · settled',
         amt: '+Rp 2.9M',
         pos: true,
         date: 'Apr 10',
       },
       {
-        icon: '📥',
-        bg: 'bg-stone/10',
-        name: 'Stake',
-        sub: 'SHALLOT-GH-BREBES-Q2 · tx: 2nBx...9kLm',
+        action: 'invest',
+        name: 'New investment',
+        sub: 'Shallot · Brebes',
         amt: '−Rp 8M',
         pos: false,
         date: 'Apr 2',
@@ -73,28 +69,25 @@ export const activityHistory: ActivityGroup[] = [
     month: 'March 2026',
     items: [
       {
-        icon: '🏆',
-        bg: 'bg-leaf/15',
-        name: 'Milestone 2 Disbursed',
-        sub: 'COFFEE-HYB-TORAJA-Q1 · 30% released',
-        amt: 'On-chain',
+        action: 'milestone',
+        name: 'Milestone paid',
+        sub: 'Toraja Arabica · 30% released',
+        amt: 'On record',
         neutral: true,
         date: 'Mar 28',
       },
       {
-        icon: '📥',
-        bg: 'bg-stone/10',
-        name: 'Stake',
-        sub: 'COFFEE-HYB-TORAJA-Q1 · tx: 8aVc...4dEf',
+        action: 'invest',
+        name: 'New investment',
+        sub: 'Toraja Arabica',
         amt: '−Rp 25M',
         pos: false,
         date: 'Mar 5',
       },
       {
-        icon: '📥',
-        bg: 'bg-stone/10',
-        name: 'Stake',
-        sub: 'CHILI-GH-SUBANG-Q2 · tx: 1kLo...6mNo',
+        action: 'invest',
+        name: 'New investment',
+        sub: 'Red Chili · Subang',
         amt: '−Rp 10M',
         pos: false,
         date: 'Mar 22',

@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
+import { MapPin, Sparkles } from 'lucide-react'
 import { ProgressBar } from './ProgressBar'
 import { StatTile } from './StatTile'
 import { StatusBadge, statusToneFromClass } from './StatusBadge'
+import { CropIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { ExploreVault } from '@/data/vaults'
 
@@ -22,17 +24,21 @@ export function ExploreVaultCard({ vault: v, onClick, onStake }: ExploreVaultCar
       )}
     >
       {v.highlight && (
-        <div className="absolute top-2.5 right-3.5 bg-gold text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-          🆕 {v.status}
+        <div className="absolute top-2.5 right-3.5 inline-flex items-center gap-1 bg-gold text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+          <Sparkles className="size-2.5" />
+          {v.status}
         </div>
       )}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="text-[28px]">{v.emoji}</div>
+          <CropIcon crop={v.crop} size="lg" />
           <div>
             <div className="text-[10px] text-stone uppercase tracking-wider">{v.type}</div>
             <div className="font-serif text-base text-forest">{v.name}</div>
-            <div className="text-[11px] text-stone">📍 {v.loc}</div>
+            <div className="text-[11px] text-stone inline-flex items-center gap-1">
+              <MapPin className="size-3" />
+              {v.loc}
+            </div>
           </div>
         </div>
         {!v.highlight && (
@@ -40,8 +46,8 @@ export function ExploreVaultCard({ vault: v, onClick, onStake }: ExploreVaultCar
         )}
       </div>
       <div className="grid grid-cols-3 gap-2 mb-3">
-        <StatTile label="Target" value={v.target} />
-        <StatTile label="Est. APY" value={v.apy} valueClass="text-sprout" />
+        <StatTile label="Goal" value={v.target} />
+        <StatTile label="Est. return" value={v.apy} valueClass="text-sprout" />
         <StatTile label={v.durationLabel ?? 'Duration'} value={v.duration} />
       </div>
       {v.highlight ? (
@@ -52,7 +58,7 @@ export function ExploreVaultCard({ vault: v, onClick, onStake }: ExploreVaultCar
           }}
           className="w-full py-2.5 rounded-[14px] bg-gold text-white font-sans text-[15px] font-semibold border-none cursor-pointer"
         >
-          Stake Now →
+          Invest now →
         </button>
       ) : (
         <>

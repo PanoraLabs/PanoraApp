@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Search } from 'lucide-react'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useExploreFilters, useExploreVaults } from '@/hooks/useVaults'
@@ -14,15 +15,15 @@ export function ExploreScreen() {
 
   return (
     <div className="flex flex-col h-full bg-surface">
-      <TopNav title="Explore Vaults" action={{ label: 'Filter', onClick: () => showToast('🔍 Filter opened') }} />
+      <TopNav title="Discover Vaults" showBack={false} action={{ label: 'Filter', onClick: () => showToast('Filter opened') }} />
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         <div className="px-[22px] pt-[18px]">
           {/* Search */}
           <div className="relative mb-3.5">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm z-10">🔍</span>
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-stone z-10" />
             <Input
               className="h-auto py-3 pl-10 pr-3.5 bg-surface border-[1.5px] border-input rounded-xl font-sans text-sm text-forest placeholder:text-stone focus-visible:border-leaf focus-visible:ring-0 transition-colors"
-              placeholder="Search vaults, commodities..."
+              placeholder="Search by crop or location..."
             />
           </div>
 

@@ -1,3 +1,4 @@
+import { CropIcon } from '@/lib/icons'
 import type { ParticipationToken } from '@/data/wallet'
 
 interface PTRowProps {
@@ -9,7 +10,7 @@ export function PTRow({ token: t, onList }: PTRowProps) {
   return (
     <div className="flex items-center justify-between p-3 bg-surface rounded-[14px]">
       <div className="flex items-center gap-2.5">
-        <div className="text-xl">{t.emoji}</div>
+        <CropIcon crop={t.crop} size="sm" />
         <div>
           <div className="text-[13px] font-medium text-forest">{t.code}</div>
           <div className="text-[11px] text-stone">{t.principal}</div>
@@ -19,7 +20,7 @@ export function PTRow({ token: t, onList }: PTRowProps) {
         onClick={onList}
         className="px-4 py-2 rounded-[10px] bg-surface text-forest text-[13px] font-semibold border-[1.5px] border-input cursor-pointer"
       >
-        List
+        Sell
       </button>
     </div>
   )

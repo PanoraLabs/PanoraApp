@@ -5,9 +5,9 @@ export interface HomeStat {
 }
 
 export const homeStats: HomeStat[] = [
-  { val: 'Rp48M', label: 'Staked', sub: 'Active' },
-  { val: '17.4%', label: 'Avg Yield', sub: '3 vaults' },
-  { val: 'Rp8.4M', label: 'Est. Profit', sub: 'All vaults' },
+  { val: 'Rp48M', label: 'Invested', sub: '3 vaults' },
+  { val: '17.4%', label: 'Avg Return', sub: 'per year' },
+  { val: 'Rp8.4M', label: 'Total Profit', sub: 'this year' },
 ]
 
 export interface IoTReading {
@@ -30,14 +30,18 @@ export interface UserProfile {
   initials: string
   totalPortfolioValue: number
   claimableValue: number
-  monthlyChange: string
+  claimableSource: string
+  gainPercent: number
+  gainAmount: string
 }
 
 export const userProfile: UserProfile = {
   greeting: 'Good morning,',
-  name: 'Agung Wibowo 🌿',
+  name: 'Agung Wibowo',
   initials: 'AW',
   totalPortfolioValue: 48_200_000,
   claimableValue: 1_820_000,
-  monthlyChange: '↑ +Rp 5M this month · 3 active vaults',
+  claimableSource: 'From your Cacao Flores harvest',
+  gainPercent: 12.4,
+  gainAmount: '+Rp 5M this month',
 }

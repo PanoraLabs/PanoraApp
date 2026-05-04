@@ -1,5 +1,7 @@
+import type { CropKey } from '@/lib/icons'
+
 export interface ParticipationToken {
-  emoji: string
+  crop: CropKey
   code: string
   principal: string
 }
@@ -10,23 +12,24 @@ export interface Claimable {
   amount: string
 }
 
-export const walletAddress = '5xKj...Ab3mPqRst'
+export const walletAddress = '5xKj...PqRst'
 
 export const walletBalances = {
-  usdc: '$2,840',
-  sol: '4.21',
+  cash: '$2,840',
+  cashLabel: 'USDC',
+  fees: '4.21 SOL',
 }
 
 export const claimables: Claimable[] = [
   {
-    code: 'CACAO-FLORES-Q4-25',
+    code: 'Cacao Flores · 2025',
     settledOn: 'Settled Apr 10, 2026',
     amount: 'Rp 1,820,000',
   },
 ]
 
 export const participationTokens: ParticipationToken[] = [
-  { emoji: '🌶️', code: 'PT-CHILI-GH-Q2', principal: 'Rp 10M principal' },
-  { emoji: '☕', code: 'PT-COFFEE-TORAJA-Q1', principal: 'Rp 25M principal' },
-  { emoji: '🧅', code: 'PT-SHALLOT-BREBES-Q2', principal: 'Rp 8M principal' },
+  { crop: 'chili', code: 'Red Chili · Subang', principal: 'Rp 10M invested' },
+  { crop: 'coffee', code: 'Toraja Arabica', principal: 'Rp 25M invested' },
+  { crop: 'shallot', code: 'Shallot · Brebes', principal: 'Rp 8M invested' },
 ]

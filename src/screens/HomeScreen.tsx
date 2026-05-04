@@ -1,4 +1,17 @@
 import { motion } from 'framer-motion'
+import {
+  Zap,
+  Coins,
+  ArrowLeftRight,
+  Scroll,
+  ChevronRight,
+  TrendingUp,
+  Thermometer,
+  Droplets,
+  Sprout as SoilIcon,
+  Sun,
+  type LucideIcon,
+} from 'lucide-react'
 import { useAppStore } from '@/store/app-store'
 import { useActiveVaults } from '@/hooks/useVaults'
 import { useRecentActivity } from '@/hooks/useActivity'
@@ -11,6 +24,12 @@ import { AnimatedCounter } from '@/components/shared/AnimatedCounter'
 import { staggerContainer, staggerItem } from '@/motion/variants'
 import { formatRupiah } from '@/lib/format'
 
+interface ActionPill {
+  Icon: LucideIcon
+  label: string
+  action: () => void
+}
+
 export function HomeScreen() {
   const { setScreen, openSheet } = useAppStore()
   const profile = useUserProfile()
@@ -18,6 +37,14 @@ export function HomeScreen() {
   const vaults = useActiveVaults()
   const recent = useRecentActivity()
   const iot = useIoTFeed()
+  const allOptimal = iot.lux >= 17
+
+  const actionPills: ActionPill[] = [
+    { Icon: Zap, label: 'Invest', action: () => setScreen('explore', 'explore') },
+    { Icon: Coins, label: 'Claim', action: () => openSheet('claim') },
+    { Icon: ArrowLeftRight, label: 'Trade', action: () => setScreen('market', 'market') },
+    { Icon: Scroll, label: 'Passport', action: () => setScreen('passport') },
+  ]
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-surface">
@@ -40,27 +67,26 @@ export function HomeScreen() {
         </div>
 
         <div className="relative z-[1] mb-4">
-          <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">Total Portfolio</div>
-          <div className="font-serif text-4xl text-white tracking-tight leading-none mb-0.5">
+          <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">Total Value</div>
+          <div className="font-serif text-4xl text-white tracking-tight leading-none mb-2">
             <AnimatedCounter value={profile.totalPortfolioValue} format={formatRupiah} />
           </div>
-          <div className="text-xs text-sprout">{profile.monthlyChange}</div>
+          <div className="inline-flex items-center gap-1.5 bg-sprout/15 border border-sprout/25 px-2.5 py-1 rounded-full">
+            <TrendingUp className="size-3 text-sprout" />
+            <span className="text-sprout text-[12px] font-semibold">+{profile.gainPercent}%</span>
+            <span className="text-white/55 text-[11px]">{profile.gainAmount}</span>
+          </div>
         </div>
 
         <div className="flex gap-2 relative z-[1]">
-          {[
-            { icon: '⚡', label: 'Stake', action: () => openSheet('stake') },
-            { icon: '💰', label: 'Claim', action: () => openSheet('claim') },
-            { icon: '🔄', label: 'Market', action: () => setScreen('market', 'market') },
-            { icon: '🌿', label: 'NFT', action: () => setScreen('passport') },
-          ].map((pill) => (
+          {actionPills.map((pill) => (
             <button
               key={pill.label}
               onClick={pill.action}
-              className="flex-1 bg-white/8 border border-white/10 rounded-[14px] py-2.5 px-2.5 text-center cursor-pointer active:bg-white/15 transition-all duration-150"
+              className="flex-1 bg-white/8 border border-white/10 rounded-[14px] py-2.5 px-2.5 flex flex-col items-center gap-1 cursor-pointer active:bg-white/15 transition-all duration-150"
             >
-              <div className="text-lg mb-1">{pill.icon}</div>
-              <div className="text-[11px] text-white/60 font-medium">{pill.label}</div>
+              <pill.Icon className="size-[18px] text-white/85" strokeWidth={2.2} />
+              <div className="text-[11px] text-white/65 font-medium">{pill.label}</div>
             </button>
           ))}
         </div>
@@ -75,14 +101,17 @@ export function HomeScreen() {
             onClick={() => openSheet('claim')}
             className="bg-gradient-to-br from-gold to-amber rounded-2xl px-4 py-3.5 flex items-center gap-3 mb-[18px] cursor-pointer"
           >
-            <div className="text-[26px]">💰</div>
+            <div className="w-11 h-11 rounded-[12px] bg-white/20 flex items-center justify-center shrink-0">
+              <Coins className="size-5 text-white" strokeWidth={2.2} />
+            </div>
             <div className="flex-1">
-              <div className="text-xs font-semibold text-white/80 mb-px">Ready to Claim</div>
-              <div className="font-serif text-xl text-white">
+              <div className="text-[10px] font-semibold text-white/85 uppercase tracking-wider mb-px">Ready to claim</div>
+              <div className="font-serif text-xl text-white leading-tight">
                 <AnimatedCounter value={profile.claimableValue} format={formatRupiah} />
               </div>
+              <div className="text-[11px] text-white/70 mt-px">{profile.claimableSource}</div>
             </div>
-            <div className="text-white/70 text-xl">›</div>
+            <ChevronRight className="size-5 text-white/70 shrink-0" />
           </motion.div>
 
           {/* Stats */}
@@ -100,9 +129,9 @@ export function HomeScreen() {
           </motion.div>
 
           <div className="flex items-center justify-between mb-3">
-            <div className="font-serif text-[17px] text-forest">Active Vaults</div>
+            <div className="font-serif text-[17px] text-forest">My Vaults</div>
             <button onClick={() => setScreen('explore', 'explore')} className="text-xs text-leaf font-medium border-none bg-transparent cursor-pointer">
-              Explore more →
+              Find more →
             </button>
           </div>
         </div>
@@ -122,12 +151,12 @@ export function HomeScreen() {
         </motion.div>
 
         <div className="px-[22px]">
-          {/* IoT Feed */}
+          {/* Crop Health */}
           <div className="flex items-center justify-between mb-3 mt-1.5">
-            <div className="font-serif text-[17px] text-forest">Live IoT Feed</div>
-            <div className="text-[11px] text-stone">
-              <span className="live-dot inline-block w-1.5 h-1.5 rounded-full bg-sprout mr-1 align-middle" />
-              CHILI-GH
+            <div className="font-serif text-[17px] text-forest">Crop Health</div>
+            <div className="text-[11px] text-stone flex items-center gap-1">
+              <span className="live-dot inline-block w-1.5 h-1.5 rounded-full bg-sprout" />
+              {allOptimal ? 'All farms healthy' : 'Needs attention'}
             </div>
           </div>
           <motion.div
@@ -137,10 +166,10 @@ export function HomeScreen() {
             className="grid grid-cols-2 gap-2.5 mb-[18px]"
           >
             {[
-              { label: 'Temperature', value: `${iot.temp}°C`, ok: true },
-              { label: 'Humidity', value: `${iot.rh}%`, ok: true },
-              { label: 'Soil pH', value: iot.ph, ok: true },
-              { label: 'Light', value: `${iot.lux}k`, ok: iot.lux >= 17 },
+              { Icon: Thermometer, label: 'Temperature', value: `${iot.temp}°C`, ok: true },
+              { Icon: Droplets, label: 'Humidity', value: `${iot.rh}%`, ok: true },
+              { Icon: SoilIcon, label: 'Soil pH', value: iot.ph, ok: true },
+              { Icon: Sun, label: 'Light', value: `${iot.lux}k lux`, ok: iot.lux >= 17 },
             ].map((item) => (
               <motion.div key={item.label} variants={staggerItem}>
                 <IoTCard label={item.label} value={item.value} ok={item.ok} />
