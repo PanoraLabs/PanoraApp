@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { usePortfolioAllocations, usePortfolioMilestones, usePositions } from '@/hooks/usePortfolio'
 import { PositionRow } from '@/components/shared/PositionRow'
+import { staggerContainer, staggerItem } from '@/motion/variants'
 import { cn } from '@/lib/utils'
 
 export function PortfolioScreen() {
@@ -61,9 +63,13 @@ export function PortfolioScreen() {
           </div>
 
           {/* Position items */}
-          {positions.map((p) => (
-            <PositionRow key={p.code} position={p} onClick={() => openSheet('vault-detail')} />
-          ))}
+          <motion.div variants={staggerContainer} initial="initial" animate="animate">
+            {positions.map((p) => (
+              <motion.div key={p.code} variants={staggerItem}>
+                <PositionRow position={p} onClick={() => openSheet('vault-detail')} />
+              </motion.div>
+            ))}
+          </motion.div>
 
           {/* Milestone Tracker */}
           <div className="flex items-center justify-between mb-3 mt-1.5">

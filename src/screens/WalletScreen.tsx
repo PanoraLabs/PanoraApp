@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useClaimables, useParticipationTokens, useWallet } from '@/hooks/useWallet'
 import { ClaimableRow } from '@/components/shared/ClaimableRow'
 import { PTRow } from '@/components/shared/PTRow'
+import { staggerContainer, staggerItem } from '@/motion/variants'
 
 export function WalletScreen() {
   const { openSheet, showToast } = useAppStore()
@@ -53,11 +55,18 @@ export function WalletScreen() {
 
           {/* Participation Tokens */}
           <div className="font-serif text-[17px] text-forest mb-3">Participation Tokens</div>
-          <div className="flex flex-col gap-2">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="flex flex-col gap-2"
+          >
             {tokens.map((t) => (
-              <PTRow key={t.code} token={t} onList={() => openSheet('sell')} />
+              <motion.div key={t.code} variants={staggerItem}>
+                <PTRow token={t} onList={() => openSheet('sell')} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
           <div className="h-2" />
         </div>
       </div>

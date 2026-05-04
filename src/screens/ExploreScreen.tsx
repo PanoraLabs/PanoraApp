@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useExploreFilters, useExploreVaults } from '@/hooks/useVaults'
 import { ExploreVaultCard } from '@/components/shared/ExploreVaultCard'
 import { Input } from '@/components/ui/input'
+import { staggerContainer, staggerItem } from '@/motion/variants'
 import { cn } from '@/lib/utils'
 
 export function ExploreScreen() {
@@ -42,16 +44,22 @@ export function ExploreScreen() {
           </div>
 
           {/* Vault cards */}
-          <div className="flex flex-col gap-3">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="flex flex-col gap-3"
+          >
             {vaults.map((v) => (
-              <ExploreVaultCard
-                key={v.name}
-                vault={v}
-                onClick={() => (v.highlight ? openSheet('stake') : openSheet('vault-detail'))}
-                onStake={() => openSheet('stake')}
-              />
+              <motion.div key={v.name} variants={staggerItem}>
+                <ExploreVaultCard
+                  vault={v}
+                  onClick={() => (v.highlight ? openSheet('stake') : openSheet('vault-detail'))}
+                  onStake={() => openSheet('stake')}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
           <div className="h-2" />
         </div>
       </div>

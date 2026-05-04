@@ -1,7 +1,9 @@
+import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useMarketListings } from '@/hooks/useMarket'
 import { MarketListingRow } from '@/components/shared/MarketListingRow'
+import { staggerContainer, staggerItem } from '@/motion/variants'
 
 export function MarketScreen() {
   const { openSheet } = useAppStore()
@@ -37,9 +39,13 @@ export function MarketScreen() {
 
           <div className="font-serif text-[17px] text-forest mb-3">Available Listings</div>
 
-          {listings.map((l) => (
-            <MarketListingRow key={l.code} listing={l} onClick={() => openSheet('buy')} />
-          ))}
+          <motion.div variants={staggerContainer} initial="initial" animate="animate">
+            {listings.map((l) => (
+              <motion.div key={l.code} variants={staggerItem}>
+                <MarketListingRow listing={l} onClick={() => openSheet('buy')} />
+              </motion.div>
+            ))}
+          </motion.div>
           <div className="h-2" />
         </div>
       </div>

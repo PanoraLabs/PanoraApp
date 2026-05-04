@@ -1,11 +1,7 @@
-const rupiahFull = new Intl.NumberFormat('id-ID', {
-  style: 'currency',
-  currency: 'IDR',
-  maximumFractionDigits: 0,
-})
+const groupedNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 
 export function formatRupiah(value: number): string {
-  return rupiahFull.format(value).replace(/ /g, ' ').replace('IDR', 'Rp')
+  return `Rp ${groupedNumber.format(value)}`
 }
 
 export function formatRupiahCompact(value: number): string {

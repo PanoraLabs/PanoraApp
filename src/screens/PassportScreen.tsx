@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { usePassportNFTs } from '@/hooks/usePassport'
 import { PassportCard } from '@/components/shared/PassportCard'
 import { Input } from '@/components/ui/input'
+import { staggerContainer, staggerItem } from '@/motion/variants'
 
 export function PassportScreen() {
   const showToast = useAppStore((s) => s.showToast)
@@ -17,9 +19,13 @@ export function PassportScreen() {
             cNFT certificates minted on Solana for every harvested batch — immutable proof of origin.
           </div>
 
-          {nfts.map((nft) => (
-            <PassportCard key={nft.id} nft={nft} />
-          ))}
+          <motion.div variants={staggerContainer} initial="initial" animate="animate">
+            {nfts.map((nft) => (
+              <motion.div key={nft.id} variants={staggerItem}>
+                <PassportCard nft={nft} />
+              </motion.div>
+            ))}
+          </motion.div>
 
           {/* Verify */}
           <div className="bg-card-bg border border-border rounded-[18px] p-[18px] mt-1">

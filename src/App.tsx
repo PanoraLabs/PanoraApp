@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useAppStore } from '@/store/app-store'
+import { pageVariants } from '@/motion/variants'
 import { PhoneFrame } from '@/components/PhoneFrame'
 import { StatusBar } from '@/components/StatusBar'
 import { BottomNav } from '@/components/BottomNav'
@@ -40,10 +41,10 @@ export default function App() {
               <motion.div
                 key={key}
                 className="absolute inset-0"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
               >
                 <Screen />
               </motion.div>

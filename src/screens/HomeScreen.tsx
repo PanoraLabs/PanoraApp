@@ -7,6 +7,9 @@ import { VaultCard } from '@/components/shared/VaultCard'
 import { StatPill } from '@/components/shared/StatPill'
 import { IoTCard } from '@/components/shared/IoTCard'
 import { ActivityRow } from '@/components/shared/ActivityRow'
+import { AnimatedCounter } from '@/components/shared/AnimatedCounter'
+import { staggerContainer, staggerItem } from '@/motion/variants'
+import { formatRupiah } from '@/lib/format'
 
 export function HomeScreen() {
   const { setScreen, openSheet } = useAppStore()
@@ -38,7 +41,9 @@ export function HomeScreen() {
 
         <div className="relative z-[1] mb-4">
           <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">Total Portfolio</div>
-          <div className="font-serif text-4xl text-white tracking-tight leading-none mb-0.5">{profile.totalPortfolio}</div>
+          <div className="font-serif text-4xl text-white tracking-tight leading-none mb-0.5">
+            <AnimatedCounter value={profile.totalPortfolioValue} format={formatRupiah} />
+          </div>
           <div className="text-xs text-sprout">{profile.monthlyChange}</div>
         </div>
 
@@ -73,17 +78,26 @@ export function HomeScreen() {
             <div className="text-[26px]">💰</div>
             <div className="flex-1">
               <div className="text-xs font-semibold text-white/80 mb-px">Ready to Claim</div>
-              <div className="font-serif text-xl text-white">{profile.claimable}</div>
+              <div className="font-serif text-xl text-white">
+                <AnimatedCounter value={profile.claimableValue} format={formatRupiah} />
+              </div>
             </div>
             <div className="text-white/70 text-xl">›</div>
           </motion.div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-2.5 mb-[18px]">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-3 gap-2.5 mb-[18px]"
+          >
             {stats.map((s) => (
-              <StatPill key={s.label} value={s.val} label={s.label} sub={s.sub} />
+              <motion.div key={s.label} variants={staggerItem}>
+                <StatPill value={s.val} label={s.label} sub={s.sub} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="flex items-center justify-between mb-3">
             <div className="font-serif text-[17px] text-forest">Active Vaults</div>
@@ -94,11 +108,18 @@ export function HomeScreen() {
         </div>
 
         {/* Vault horizontal scroll */}
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar mx-0 px-[22px] pb-1">
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+          className="flex gap-3 overflow-x-auto hide-scrollbar mx-0 px-[22px] pb-1"
+        >
           {vaults.map((v) => (
-            <VaultCard key={v.name} vault={v} onClick={() => openSheet('vault-detail')} />
+            <motion.div key={v.name} variants={staggerItem} className="shrink-0">
+              <VaultCard vault={v} onClick={() => openSheet('vault-detail')} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <div className="px-[22px]">
           {/* IoT Feed */}
@@ -109,12 +130,23 @@ export function HomeScreen() {
               CHILI-GH
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2.5 mb-[18px]">
-            <IoTCard label="Temperature" value={`${iot.temp}°C`} ok />
-            <IoTCard label="Humidity" value={`${iot.rh}%`} ok />
-            <IoTCard label="Soil pH" value={iot.ph} ok />
-            <IoTCard label="Light" value={`${iot.lux}k`} ok={iot.lux >= 17} />
-          </div>
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-2 gap-2.5 mb-[18px]"
+          >
+            {[
+              { label: 'Temperature', value: `${iot.temp}°C`, ok: true },
+              { label: 'Humidity', value: `${iot.rh}%`, ok: true },
+              { label: 'Soil pH', value: iot.ph, ok: true },
+              { label: 'Light', value: `${iot.lux}k`, ok: iot.lux >= 17 },
+            ].map((item) => (
+              <motion.div key={item.label} variants={staggerItem}>
+                <IoTCard label={item.label} value={item.value} ok={item.ok} />
+              </motion.div>
+            ))}
+          </motion.div>
 
           {/* Recent Activity */}
           <div className="flex items-center justify-between mb-3">
@@ -123,9 +155,13 @@ export function HomeScreen() {
               See all →
             </button>
           </div>
-          {recent.map((a) => (
-            <ActivityRow key={a.sub} item={a} compactNeutral />
-          ))}
+          <motion.div variants={staggerContainer} initial="initial" animate="animate">
+            {recent.map((a) => (
+              <motion.div key={a.sub} variants={staggerItem}>
+                <ActivityRow item={a} compactNeutral />
+              </motion.div>
+            ))}
+          </motion.div>
           <div className="h-2" />
         </div>
       </div>

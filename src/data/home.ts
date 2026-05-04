@@ -28,16 +28,16 @@ export interface UserProfile {
   greeting: string
   name: string
   initials: string
-  totalPortfolio: string
+  totalPortfolioValue: number
+  claimableValue: number
   monthlyChange: string
-  claimable: string
 }
 
 export const userProfile: UserProfile = {
   greeting: 'Good morning,',
   name: 'Agung Wibowo 🌿',
   initials: 'AW',
-  totalPortfolio: 'Rp 48,200,000',
+  totalPortfolioValue: 48_200_000,
+  claimableValue: 1_820_000,
   monthlyChange: '↑ +Rp 5M this month · 3 active vaults',
-  claimable: 'Rp 1,820,000',
 }
