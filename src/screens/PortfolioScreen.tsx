@@ -1,9 +1,13 @@
 import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
+import { usePortfolioAllocations, usePortfolioMilestones, usePositions } from '@/hooks/usePortfolio'
 
 export function PortfolioScreen() {
   const openSheet = useAppStore((s) => s.openSheet)
+  const positions = usePositions()
+  const allocations = usePortfolioAllocations()
+  const milestones = usePortfolioMilestones()
 
   return (
     <div className="flex flex-col h-full bg-surface">
@@ -22,11 +26,7 @@ export function PortfolioScreen() {
                 <circle cx="50" cy="50" r="38" fill="none" stroke="#C8961E" strokeWidth="16" strokeDasharray="238.6" strokeDashoffset="155.1" transform="rotate(162 50 50)" />
               </svg>
               <div className="flex flex-col gap-1.5">
-                {[
-                  { color: '#5DBB7A', label: 'Greenhouse 55%' },
-                  { color: '#C8961E', label: 'Export RWA 35%' },
-                  { color: 'rgba(255,255,255,0.3)', label: 'Bulk 10%' },
-                ].map((l) => (
+                {allocations.map((l) => (
                   <div key={l.label} className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full" style={{ background: l.color }} />
                     <div className="text-[11px] text-white/60">{l.label}</div>
@@ -46,11 +46,7 @@ export function PortfolioScreen() {
           </div>
 
           {/* Position items */}
-          {[
-            { emoji: '🌶️', code: 'CHILI-GH-SUBANG-Q2', sub: 'Greenhouse · West Java', val: 'Rp 10M', profit: '+Rp 1.8M', pct: 72, profitColor: 'text-sprout' },
-            { emoji: '☕', code: 'COFFEE-TORAJA-Q1', sub: 'Export RWA · Sulawesi', val: 'Rp 25M', profit: '+Rp 5.5M', pct: 67, profitColor: 'text-sprout' },
-            { emoji: '🧅', code: 'SHALLOT-BREBES-Q2', sub: 'Greenhouse · Central Java', val: 'Rp 8M', profit: 'Day 30/100', pct: 30, profitColor: 'text-gold', gold: true },
-          ].map((p) => (
+          {positions.map((p) => (
             <motion.div
               key={p.code}
               whileTap={{ scale: 0.98 }}
@@ -81,13 +77,9 @@ export function PortfolioScreen() {
             <div className="text-[11px] text-stone">CHILI-GH-Q2</div>
           </div>
           <div className="bg-card-bg border border-border rounded-[18px] p-[18px] mb-3.5">
-            {[
-              { dot: 'bg-sprout text-white', icon: '✓', title: 'Setup & Seeds (40%)', sub: 'Disbursed Apr 2 · Rp 4,000,000' },
-              { dot: 'bg-gold text-white', icon: '!', title: 'Mid-Season Nutrients (30%)', sub: 'Awaiting PoA verification' },
-              { dot: 'bg-surface border-[1.5px] border-input text-stone', icon: '3', title: 'Harvest & Logistics (30%)', sub: 'Pending · Est. Jun 28' },
-            ].map((m, i) => (
+            {milestones.map((m, i) => (
               <div key={i} className="flex gap-3 pb-3.5 relative">
-                {i < 2 && <div className="absolute left-[11px] top-[26px] bottom-0 w-[1.5px] bg-border" />}
+                {i < milestones.length - 1 && <div className="absolute left-[11px] top-[26px] bottom-0 w-[1.5px] bg-border" />}
                 <div className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold ${m.dot}`}>
                   {m.icon}
                 </div>

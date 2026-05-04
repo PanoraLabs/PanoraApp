@@ -1,41 +1,12 @@
 import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
-
-const filters = [
-  { label: 'All', active: true },
-  { label: '🌶️ Greenhouse', active: false },
-  { label: '☕ Export RWA', active: false },
-  { label: '🌾 Bulk', active: false },
-  { label: '🆕 Open Now', active: false },
-]
-
-const vaults = [
-  {
-    emoji: '🌶️', type: 'Greenhouse · West Java', name: 'Red Chili Subang', loc: 'Subang',
-    status: 'Active', statusClass: 'bg-leaf/15 text-leaf',
-    target: 'Rp 20M', apy: '18%', duration: '90 days', funded: 78, highlight: false,
-  },
-  {
-    emoji: '🌸', type: 'Export RWA · Central Java', name: 'Vanilla Temanggung', loc: 'Temanggung',
-    status: 'OPEN · 48h left', statusClass: 'bg-gold text-white',
-    target: 'Rp 50M', apy: '24%', duration: 'Rp 1M', funded: 0, highlight: true,
-    durationLabel: 'Min Stake',
-  },
-  {
-    emoji: '☕', type: 'Export RWA · Sulawesi', name: 'Toraja Arabica Coffee', loc: 'Toraja',
-    status: 'Full', statusClass: 'bg-stone/12 text-stone',
-    target: 'Rp 100M', apy: '22%', duration: '6 mos', funded: 100, full: true,
-  },
-  {
-    emoji: '🌾', type: 'Bulk Commodity · West Java', name: 'Karawang Premium Rice', loc: 'Karawang',
-    status: 'Open', statusClass: 'bg-leaf/15 text-leaf',
-    target: 'Rp 200M', apy: '11%', duration: '130d', funded: 55,
-  },
-]
+import { useExploreFilters, useExploreVaults } from '@/hooks/useVaults'
 
 export function ExploreScreen() {
   const { openSheet, showToast } = useAppStore()
+  const filters = useExploreFilters()
+  const vaults = useExploreVaults()
 
   return (
     <div className="flex flex-col h-full bg-surface">

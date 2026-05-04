@@ -1,27 +1,16 @@
-import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAppStore } from '@/store/app-store'
-
-function jitter(base: number, range: number) {
-  return (base + (Math.random() - 0.5) * range).toFixed(1)
-}
+import { useActiveVaults } from '@/hooks/useVaults'
+import { useRecentActivity } from '@/hooks/useActivity'
+import { useHomeStats, useIoTFeed, useUserProfile } from '@/hooks/useHome'
 
 export function HomeScreen() {
   const { setScreen, openSheet } = useAppStore()
-
-  const [iot, setIot] = useState({ temp: '28.0', rh: '82.0', ph: '6.4', lux: 18 })
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setIot({
-        temp: jitter(28, 1.5),
-        rh: jitter(82, 4),
-        ph: parseFloat(jitter(6.4, 0.3)).toFixed(1),
-        lux: Math.round(parseFloat(jitter(18000, 2000)) / 1000),
-      })
-    }, 5000)
-    return () => clearInterval(id)
-  }, [])
+  const profile = useUserProfile()
+  const stats = useHomeStats()
+  const vaults = useActiveVaults()
+  const recent = useRecentActivity()
+  const iot = useIoTFeed()
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-surface">
@@ -33,21 +22,21 @@ export function HomeScreen() {
 
         <div className="flex items-center justify-between mb-[18px] relative z-[1]">
           <div>
-            <div className="text-xs text-white/45 mb-0.5">Good morning,</div>
-            <div className="font-serif text-xl text-white tracking-tight">Agung Wibowo 🌿</div>
+            <div className="text-xs text-white/45 mb-0.5">{profile.greeting}</div>
+            <div className="font-serif text-xl text-white tracking-tight">{profile.name}</div>
           </div>
           <button
             onClick={() => setScreen('wallet', 'wallet')}
             className="w-[38px] h-[38px] rounded-full bg-gold flex items-center justify-center font-serif text-[15px] text-white border-2 border-white/20 cursor-pointer"
           >
-            AW
+            {profile.initials}
           </button>
         </div>
 
         <div className="relative z-[1] mb-4">
           <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">Total Portfolio</div>
-          <div className="font-serif text-4xl text-white tracking-tight leading-none mb-0.5">Rp 48,200,000</div>
-          <div className="text-xs text-sprout">↑ +Rp 5M this month · 3 active vaults</div>
+          <div className="font-serif text-4xl text-white tracking-tight leading-none mb-0.5">{profile.totalPortfolio}</div>
+          <div className="text-xs text-sprout">{profile.monthlyChange}</div>
         </div>
 
         <div className="flex gap-2 relative z-[1]">
@@ -81,18 +70,14 @@ export function HomeScreen() {
             <div className="text-[26px]">💰</div>
             <div className="flex-1">
               <div className="text-xs font-semibold text-white/80 mb-px">Ready to Claim</div>
-              <div className="font-serif text-xl text-white">Rp 1,820,000</div>
+              <div className="font-serif text-xl text-white">{profile.claimable}</div>
             </div>
             <div className="text-white/70 text-xl">›</div>
           </motion.div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2.5 mb-[18px]">
-            {[
-              { val: 'Rp48M', label: 'Staked', sub: 'Active' },
-              { val: '17.4%', label: 'Avg Yield', sub: '3 vaults' },
-              { val: 'Rp8.4M', label: 'Est. Profit', sub: 'All vaults' },
-            ].map((stat) => (
+            {stats.map((stat) => (
               <div key={stat.label} className="bg-card-bg border border-border rounded-[14px] p-3.5 text-center">
                 <div className="font-serif text-[22px] text-forest leading-none mb-0.5">{stat.val}</div>
                 <div className="text-[10px] text-stone uppercase tracking-wider">{stat.label}</div>
@@ -111,11 +96,7 @@ export function HomeScreen() {
 
         {/* Vault horizontal scroll */}
         <div className="flex gap-3 overflow-x-auto hide-scrollbar mx-0 px-[22px] pb-1">
-          {[
-            { emoji: '🌶️', status: 'Active', type: 'Greenhouse · West Java', name: 'Red Chili Subang', loc: 'Subang, West Java', staked: 'Rp 10M', apy: '18%', day: '65/90', pct: 72 },
-            { emoji: '☕', status: 'Active', type: 'Export RWA · Sulawesi', name: 'Toraja Arabica', loc: 'Toraja, South Sulawesi', staked: 'Rp 25M', apy: '22%', day: '120/180', pct: 67 },
-            { emoji: '🧅', status: 'Growing', type: 'Greenhouse · Central Java', name: 'Shallot Brebes', loc: 'Brebes, Central Java', staked: 'Rp 8M', apy: '16%', day: '30/100', pct: 30, gold: true },
-          ].map((v) => (
+          {vaults.map((v) => (
             <motion.div
               key={v.name}
               whileTap={{ scale: 0.98 }}
@@ -190,11 +171,7 @@ export function HomeScreen() {
               See all →
             </button>
           </div>
-          {[
-            { icon: '💰', bg: 'bg-gold/15', name: 'Profit Claim', sub: 'CACAO-FLORES-Q4-25', amt: '+Rp 2.9M', pos: true, date: 'Apr 10' },
-            { icon: '📥', bg: 'bg-stone/10', name: 'Stake', sub: 'SHALLOT-GH-BREBES-Q2', amt: '−Rp 8M', pos: false, date: 'Apr 2' },
-            { icon: '🏆', bg: 'bg-leaf/15', name: 'Milestone 2', sub: 'COFFEE-HYB-TORAJA', amt: 'Disbursed', pos: false, date: 'Mar 28', neutral: true },
-          ].map((a) => (
+          {recent.map((a) => (
             <div key={a.sub} className="flex items-center gap-3 p-3 bg-surface rounded-[14px] mb-2 cursor-pointer active:bg-forest/5 transition-colors">
               <div className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center text-[17px] shrink-0 ${a.bg}`}>
                 {a.icon}
