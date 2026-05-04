@@ -1,6 +1,8 @@
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useClaimables, useParticipationTokens, useWallet } from '@/hooks/useWallet'
+import { ClaimableRow } from '@/components/shared/ClaimableRow'
+import { PTRow } from '@/components/shared/PTRow'
 
 export function WalletScreen() {
   const { openSheet, showToast } = useAppStore()
@@ -46,42 +48,14 @@ export function WalletScreen() {
           {/* Claimable */}
           <div className="font-serif text-[17px] text-forest mb-3">Claimable Profits</div>
           {claimables.map((c) => (
-            <div key={c.code} className="flex items-center justify-between p-3.5 bg-mist border border-leaf/20 rounded-[14px] mb-4">
-              <div>
-                <div className="text-xs font-medium text-forest">{c.code}</div>
-                <div className="text-[11px] text-stone">{c.settledOn}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold text-moss">{c.amount}</div>
-                <button
-                  onClick={() => openSheet('claim')}
-                  className="mt-1.5 px-4 py-2 rounded-[10px] bg-forest text-white text-[13px] font-semibold border-none cursor-pointer"
-                >
-                  Claim
-                </button>
-              </div>
-            </div>
+            <ClaimableRow key={c.code} claimable={c} onClaim={() => openSheet('claim')} />
           ))}
 
           {/* Participation Tokens */}
           <div className="font-serif text-[17px] text-forest mb-3">Participation Tokens</div>
           <div className="flex flex-col gap-2">
             {tokens.map((t) => (
-              <div key={t.code} className="flex items-center justify-between p-3 bg-surface rounded-[14px]">
-                <div className="flex items-center gap-2.5">
-                  <div className="text-xl">{t.emoji}</div>
-                  <div>
-                    <div className="text-[13px] font-medium text-forest">{t.code}</div>
-                    <div className="text-[11px] text-stone">{t.principal}</div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => openSheet('sell')}
-                  className="px-4 py-2 rounded-[10px] bg-surface text-forest text-[13px] font-semibold border-[1.5px] border-input cursor-pointer"
-                >
-                  List
-                </button>
-              </div>
+              <PTRow key={t.code} token={t} onList={() => openSheet('sell')} />
             ))}
           </div>
           <div className="h-2" />

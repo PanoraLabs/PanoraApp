@@ -3,6 +3,10 @@ import { useAppStore } from '@/store/app-store'
 import { useActiveVaults } from '@/hooks/useVaults'
 import { useRecentActivity } from '@/hooks/useActivity'
 import { useHomeStats, useIoTFeed, useUserProfile } from '@/hooks/useHome'
+import { VaultCard } from '@/components/shared/VaultCard'
+import { StatPill } from '@/components/shared/StatPill'
+import { IoTCard } from '@/components/shared/IoTCard'
+import { ActivityRow } from '@/components/shared/ActivityRow'
 
 export function HomeScreen() {
   const { setScreen, openSheet } = useAppStore()
@@ -16,7 +20,6 @@ export function HomeScreen() {
     <div className="flex flex-col h-full overflow-hidden bg-surface">
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-forest via-[#0D3520] to-[#153D25] px-[22px] pt-5 pb-7 relative overflow-hidden shrink-0">
-        {/* Decorative circles */}
         <div className="absolute w-[200px] h-[200px] -top-20 -right-15 rounded-full border border-white/5" />
         <div className="absolute w-[120px] h-[120px] -bottom-[30px] -left-5 rounded-full border border-white/5" />
 
@@ -77,12 +80,8 @@ export function HomeScreen() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2.5 mb-[18px]">
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-card-bg border border-border rounded-[14px] p-3.5 text-center">
-                <div className="font-serif text-[22px] text-forest leading-none mb-0.5">{stat.val}</div>
-                <div className="text-[10px] text-stone uppercase tracking-wider">{stat.label}</div>
-                <div className="text-[10px] text-sprout mt-0.5">{stat.sub}</div>
-              </div>
+            {stats.map((s) => (
+              <StatPill key={s.label} value={s.val} label={s.label} sub={s.sub} />
             ))}
           </div>
 
@@ -97,44 +96,7 @@ export function HomeScreen() {
         {/* Vault horizontal scroll */}
         <div className="flex gap-3 overflow-x-auto hide-scrollbar mx-0 px-[22px] pb-1">
           {vaults.map((v) => (
-            <motion.div
-              key={v.name}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => openSheet('vault-detail')}
-              className="bg-card-bg border border-border rounded-[18px] p-4 min-w-[210px] shrink-0 cursor-pointer"
-            >
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[26px]">{v.emoji}</span>
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${v.status === 'Active' ? 'bg-leaf/15 text-leaf' : 'bg-gold/15 text-gold'}`}>
-                  {v.status}
-                </span>
-              </div>
-              <div className="text-[10px] text-stone uppercase tracking-wider mb-0.5">{v.type}</div>
-              <div className="font-serif text-[15px] text-forest mb-0.5">{v.name}</div>
-              <div className="text-[11px] text-stone mb-3">📍 {v.loc}</div>
-              <div className="grid grid-cols-2 gap-2 mb-2.5">
-                <div className="bg-surface rounded-lg p-2">
-                  <div className="text-[9px] text-stone uppercase tracking-wider mb-0.5">Staked</div>
-                  <div className="text-sm font-medium text-forest">{v.staked}</div>
-                </div>
-                <div className="bg-surface rounded-lg p-2">
-                  <div className="text-[9px] text-stone uppercase tracking-wider mb-0.5">Est. APY</div>
-                  <div className="text-sm font-medium text-sprout">{v.apy}</div>
-                </div>
-              </div>
-              <div className="flex justify-between text-[10px] text-stone mb-1">
-                <span>Day {v.day}</span>
-                <span className={`font-semibold ${v.gold ? 'text-gold' : 'text-forest'}`}>{v.pct}%</span>
-              </div>
-              <div className="h-1 bg-surface rounded-full overflow-hidden">
-                <motion.div
-                  className={`h-full rounded-full ${v.gold ? 'bg-gradient-to-r from-gold to-amber' : 'bg-gradient-to-r from-leaf to-sprout'}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${v.pct}%` }}
-                  transition={{ duration: 0.6 }}
-                />
-              </div>
-            </motion.div>
+            <VaultCard key={v.name} vault={v} onClick={() => openSheet('vault-detail')} />
           ))}
         </div>
 
@@ -148,20 +110,10 @@ export function HomeScreen() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2.5 mb-[18px]">
-            {[
-              { label: 'Temperature', val: `${iot.temp}°C`, ok: true },
-              { label: 'Humidity', val: `${iot.rh}%`, ok: true },
-              { label: 'Soil pH', val: iot.ph, ok: true },
-              { label: 'Light', val: `${iot.lux}k`, ok: iot.lux >= 17 },
-            ].map((item) => (
-              <div key={item.label} className="bg-surface rounded-xl p-3">
-                <div className="text-[10px] text-stone uppercase tracking-wider mb-0.5">{item.label}</div>
-                <div className="font-serif text-[22px] text-forest leading-none mb-0.5">{item.val}</div>
-                <div className={`text-[10px] font-semibold ${item.ok ? 'text-sprout' : 'text-gold'}`}>
-                  {item.ok ? '✓ Optimal' : '⚠ Low'}
-                </div>
-              </div>
-            ))}
+            <IoTCard label="Temperature" value={`${iot.temp}°C`} ok />
+            <IoTCard label="Humidity" value={`${iot.rh}%`} ok />
+            <IoTCard label="Soil pH" value={iot.ph} ok />
+            <IoTCard label="Light" value={`${iot.lux}k`} ok={iot.lux >= 17} />
           </div>
 
           {/* Recent Activity */}
@@ -172,21 +124,7 @@ export function HomeScreen() {
             </button>
           </div>
           {recent.map((a) => (
-            <div key={a.sub} className="flex items-center gap-3 p-3 bg-surface rounded-[14px] mb-2 cursor-pointer active:bg-forest/5 transition-colors">
-              <div className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center text-[17px] shrink-0 ${a.bg}`}>
-                {a.icon}
-              </div>
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-forest mb-px">{a.name}</div>
-                <div className="text-[11px] text-stone">{a.sub}</div>
-              </div>
-              <div>
-                <div className={`text-sm font-semibold text-right ${a.pos ? 'text-sprout' : a.neutral ? 'text-stone text-xs' : 'text-ink'}`}>
-                  {a.amt}
-                </div>
-                <div className="text-[10px] text-stone text-right mt-px">{a.date}</div>
-              </div>
-            </div>
+            <ActivityRow key={a.sub} item={a} compactNeutral />
           ))}
           <div className="h-2" />
         </div>

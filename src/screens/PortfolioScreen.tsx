@@ -1,13 +1,16 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { usePortfolioAllocations, usePortfolioMilestones, usePositions } from '@/hooks/usePortfolio'
+import { PositionRow } from '@/components/shared/PositionRow'
+import { cn } from '@/lib/utils'
 
 export function PortfolioScreen() {
   const openSheet = useAppStore((s) => s.openSheet)
   const positions = usePositions()
   const allocations = usePortfolioAllocations()
   const milestones = usePortfolioMilestones()
+  const [activeTab, setActiveTab] = useState<'active' | 'settled'>('active')
 
   return (
     <div className="flex flex-col h-full bg-surface">
@@ -40,35 +43,26 @@ export function PortfolioScreen() {
           <div className="flex items-center justify-between mb-3">
             <div className="font-serif text-[17px] text-forest">All Positions</div>
             <div className="flex gap-1.5">
-              <div className="px-2.5 py-1 bg-forest text-white rounded-full text-[10px] font-semibold cursor-pointer">Active</div>
-              <div className="px-2.5 py-1 bg-surface text-stone rounded-full text-[10px] font-medium cursor-pointer border-[1.5px] border-input">Settled</div>
+              {(['active', 'settled'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    'px-2.5 py-1 rounded-full text-[10px] cursor-pointer transition-colors',
+                    activeTab === tab
+                      ? 'bg-forest text-white font-semibold'
+                      : 'bg-surface text-stone font-medium border-[1.5px] border-input'
+                  )}
+                >
+                  {tab === 'active' ? 'Active' : 'Settled'}
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Position items */}
           {positions.map((p) => (
-            <motion.div
-              key={p.code}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => openSheet('vault-detail')}
-              className="flex items-center gap-3 p-3.5 bg-surface rounded-[14px] cursor-pointer mb-2 active:bg-forest/5 transition-colors"
-            >
-              <div className="text-[22px]">{p.emoji}</div>
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-forest">{p.code}</div>
-                <div className="text-[11px] text-stone mt-px">{p.sub}</div>
-                <div className="mt-1.5 h-1 bg-card-bg rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${p.gold ? 'bg-gradient-to-r from-gold to-amber' : 'bg-gradient-to-r from-leaf to-sprout'}`}
-                    style={{ width: `${p.pct}%` }}
-                  />
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-forest">{p.val}</div>
-                <div className={`text-[11px] mt-px ${p.profitColor}`}>{p.profit}</div>
-              </div>
-            </motion.div>
+            <PositionRow key={p.code} position={p} onClick={() => openSheet('vault-detail')} />
           ))}
 
           {/* Milestone Tracker */}

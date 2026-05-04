@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useMarketListings } from '@/hooks/useMarket'
+import { MarketListingRow } from '@/components/shared/MarketListingRow'
 
 export function MarketScreen() {
   const { openSheet } = useAppStore()
@@ -38,26 +38,7 @@ export function MarketScreen() {
           <div className="font-serif text-[17px] text-forest mb-3">Available Listings</div>
 
           {listings.map((l) => (
-            <motion.div
-              key={l.code}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => openSheet('buy')}
-              className="flex items-center justify-between p-3.5 bg-surface rounded-[14px] cursor-pointer mb-2 active:bg-forest/5 transition-colors"
-            >
-              <div className="flex items-center gap-2.5 flex-1">
-                <div className="w-9 h-9 rounded-[10px] bg-mist flex items-center justify-center text-[17px] shrink-0">
-                  {l.emoji}
-                </div>
-                <div>
-                  <div className="text-[13px] font-medium text-forest">{l.code}</div>
-                  <div className="text-[11px] text-stone mt-px">{l.day}</div>
-                </div>
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-forest text-right">{l.price}</div>
-                <div className={`text-[11px] text-right mt-px ${l.up ? 'text-sprout' : 'text-danger'}`}>{l.chg}</div>
-              </div>
-            </motion.div>
+            <MarketListingRow key={l.code} listing={l} onClick={() => openSheet('buy')} />
           ))}
           <div className="h-2" />
         </div>
