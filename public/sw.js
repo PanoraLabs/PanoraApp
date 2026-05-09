@@ -1,5 +1,5 @@
 /* Panora PWA service worker */
-const VERSION = 'panora-v1';
+const VERSION = 'panora-v2';
 const APP_SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 

@@ -14,6 +14,7 @@ import {
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useClaimables, useParticipationTokens, useWallet } from '@/hooks/useWallet'
+import { useUser } from '@/hooks/useUser'
 import { ClaimableRow } from '@/components/shared/ClaimableRow'
 import { PTRow } from '@/components/shared/PTRow'
 import { SettingsRow, SettingsGroup } from '@/components/shared/SettingsRow'
@@ -22,8 +23,11 @@ import { staggerContainer, staggerItem } from '@/motion/variants'
 export function WalletScreen() {
   const { openSheet, showToast, showResult } = useAppStore()
   const { address, balances } = useWallet()
+  const { user, signOut } = useUser()
   const claimables = useClaimables()
   const tokens = useParticipationTokens()
+  const displayName = user?.name ?? 'Account'
+  const displayEmail = user?.email ?? null
 
   return (
     <div className="flex flex-col h-full bg-surface">
@@ -35,7 +39,10 @@ export function WalletScreen() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">My Account</div>
-                <div className="text-xl font-semibold text-white">Agung Wibowo</div>
+                <div className="text-xl font-semibold text-white">{displayName}</div>
+                {displayEmail && (
+                  <div className="text-[11px] text-white/45 mt-0.5">{displayEmail}</div>
+                )}
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-white/40 mb-0.5">Wallet ID</div>
@@ -173,7 +180,9 @@ export function WalletScreen() {
                 Icon={LogOut}
                 label="Log out"
                 tone="danger"
-                onClick={() => showToast('Logged out')}
+                onClick={() => {
+                  signOut().catch((err) => showToast(`Sign out failed: ${err.message}`))
+                }}
               />
             </SettingsGroup>
           </div>

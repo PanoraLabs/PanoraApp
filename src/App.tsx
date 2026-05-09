@@ -6,6 +6,7 @@ import { StatusBar } from '@/components/StatusBar'
 import { BottomNav } from '@/components/BottomNav'
 import { Toast } from '@/components/Toast'
 import { ResultModal } from '@/components/ResultModal'
+import { AuthGate } from '@/components/AuthGate'
 import { HomeScreen } from '@/screens/HomeScreen'
 import { ExploreScreen } from '@/screens/ExploreScreen'
 import { PortfolioScreen } from '@/screens/PortfolioScreen'
@@ -29,12 +30,11 @@ const screens = {
   wallet: WalletScreen,
 } as const
 
-export default function App() {
+function MainApp() {
   const screen = useAppStore((s) => s.screen)
 
   return (
-    <PhoneFrame>
-      <StatusBar />
+    <>
       <div className="flex-1 overflow-hidden relative">
         <AnimatePresence mode="wait">
           {Object.entries(screens).map(([key, Screen]) =>
@@ -52,15 +52,25 @@ export default function App() {
             ) : null
           )}
         </AnimatePresence>
-        {/* Bottom sheets */}
         <StakeSheet />
         <ClaimSheet />
         <VaultDetailSheet />
         <BuySheet />
         <SellSheet />
-        <ResultModal />
       </div>
       <BottomNav />
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <PhoneFrame>
+      <StatusBar />
+      <AuthGate>
+        <MainApp />
+      </AuthGate>
+      <ResultModal />
       <Toast />
     </PhoneFrame>
   )

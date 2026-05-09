@@ -1,12 +1,27 @@
 import { useEffect, useState } from 'react'
 import { homeStats, iotInitial, userProfile, type IoTReading } from '@/data/home'
+import { initials, useUser } from '@/hooks/useUser'
 
 export function useHomeStats() {
   return homeStats
 }
 
+function greetingFor(date = new Date()): string {
+  const h = date.getHours()
+  if (h < 11) return 'Good morning,'
+  if (h < 17) return 'Good afternoon,'
+  return 'Good evening,'
+}
+
 export function useUserProfile() {
-  return userProfile
+  const { user } = useUser()
+  if (!user) return userProfile
+  return {
+    ...userProfile,
+    greeting: greetingFor(),
+    name: user.name,
+    initials: initials(user.name),
+  }
 }
 
 function jitter(base: number, range: number) {

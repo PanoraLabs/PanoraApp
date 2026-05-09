@@ -11,12 +11,23 @@ export interface ResultPayload {
   primaryLabel?: string
 }
 
+export interface StoredUser {
+  id: string
+  privyId: string
+  email: string | null
+  name: string
+  walletAddress: string
+  avatarUrl: string | null
+}
+
 interface AppState {
   screen: Screen
   navTab: string
   sheet: Sheet
   toast: string | null
   result: ResultPayload | null
+  user: StoredUser | null
+  isLoadingProfile: boolean
   setScreen: (screen: Screen, tab?: string) => void
   openSheet: (sheet: Sheet) => void
   closeSheet: () => void
@@ -24,6 +35,8 @@ interface AppState {
   hideToast: () => void
   showResult: (payload: ResultPayload) => void
   hideResult: () => void
+  setUser: (user: StoredUser | null) => void
+  setIsLoadingProfile: (loading: boolean) => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -32,6 +45,8 @@ export const useAppStore = create<AppState>((set) => ({
   sheet: null,
   toast: null,
   result: null,
+  user: null,
+  isLoadingProfile: false,
   setScreen: (screen, tab) =>
     set({
       screen,
@@ -46,4 +61,6 @@ export const useAppStore = create<AppState>((set) => ({
   hideToast: () => set({ toast: null }),
   showResult: (payload) => set({ result: payload }),
   hideResult: () => set({ result: null }),
+  setUser: (user) => set({ user }),
+  setIsLoadingProfile: (isLoadingProfile) => set({ isLoadingProfile }),
 }))
