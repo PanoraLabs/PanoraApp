@@ -47,20 +47,21 @@ export function HomeScreen() {
   ]
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-surface">
+    <div className="flex flex-col h-full bg-surface">
+      <div className="flex-1 overflow-y-auto hide-scrollbar">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-forest via-[#0D3520] to-[#153D25] px-[22px] pt-5 pb-7 relative overflow-hidden shrink-0">
+      <div className="bg-gradient-to-br from-forest via-[#0D3520] to-[#153D25] px-[22px] pt-5 pb-7 relative overflow-hidden">
         <div className="absolute w-[200px] h-[200px] -top-20 -right-15 rounded-full border border-white/5" />
         <div className="absolute w-[120px] h-[120px] -bottom-[30px] -left-5 rounded-full border border-white/5" />
 
         <div className="flex items-center justify-between mb-[18px] relative z-[1]">
           <div>
             <div className="text-xs text-white/45 mb-0.5">{profile.greeting}</div>
-            <div className="font-serif text-xl text-white tracking-tight">{profile.name}</div>
+            <div className="text-xl font-semibold text-white tracking-tight">{profile.name}</div>
           </div>
           <button
             onClick={() => setScreen('wallet', 'wallet')}
-            className="w-[38px] h-[38px] rounded-full bg-gold flex items-center justify-center font-serif text-[15px] text-white border-2 border-white/20 cursor-pointer"
+            className="w-[38px] h-[38px] rounded-full bg-gold flex items-center justify-center text-[13px] font-semibold text-white border-2 border-white/20 cursor-pointer"
           >
             {profile.initials}
           </button>
@@ -92,26 +93,25 @@ export function HomeScreen() {
         </div>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto hide-scrollbar">
+      {/* Content */}
         <div className="px-[22px] pt-[18px]">
           {/* Claimable Banner */}
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={() => openSheet('claim')}
-            className="bg-gradient-to-br from-gold to-amber rounded-2xl px-4 py-3.5 flex items-center gap-3 mb-[18px] cursor-pointer"
+            className="bg-gradient-to-br from-gold to-amber rounded-xl px-3 py-2.5 flex items-center gap-2.5 mb-[18px] cursor-pointer"
           >
-            <div className="w-11 h-11 rounded-[12px] bg-white/20 flex items-center justify-center shrink-0">
-              <Coins className="size-5 text-white" strokeWidth={2.2} />
+            <div className="w-9 h-9 rounded-[10px] bg-white/20 flex items-center justify-center shrink-0">
+              <Coins className="size-4 text-white" strokeWidth={2.2} />
             </div>
-            <div className="flex-1">
-              <div className="text-[10px] font-semibold text-white/85 uppercase tracking-wider mb-px">Ready to claim</div>
-              <div className="font-serif text-xl text-white leading-tight">
+            <div className="flex-1 min-w-0">
+              <div className="text-[9px] font-semibold text-white/85 uppercase tracking-wider">Ready to claim</div>
+              <div className="font-serif text-base text-white leading-tight">
                 <AnimatedCounter value={profile.claimableValue} format={formatRupiah} />
               </div>
-              <div className="text-[11px] text-white/70 mt-px">{profile.claimableSource}</div>
+              <div className="text-[10px] text-white/70 leading-tight mt-px truncate">{profile.claimableSource}</div>
             </div>
-            <ChevronRight className="size-5 text-white/70 shrink-0" />
+            <ChevronRight className="size-4 text-white/70 shrink-0" />
           </motion.div>
 
           {/* Stats */}
@@ -129,7 +129,7 @@ export function HomeScreen() {
           </motion.div>
 
           <div className="flex items-center justify-between mb-3">
-            <div className="font-serif text-[17px] text-forest">My Vaults</div>
+            <div className="text-[15px] font-semibold text-forest">My Vaults</div>
             <button onClick={() => setScreen('explore', 'explore')} className="text-xs text-leaf font-medium border-none bg-transparent cursor-pointer">
               Find more →
             </button>
@@ -153,7 +153,7 @@ export function HomeScreen() {
         <div className="px-[22px]">
           {/* Crop Health */}
           <div className="flex items-center justify-between mb-3 mt-1.5">
-            <div className="font-serif text-[17px] text-forest">Crop Health</div>
+            <div className="text-[15px] font-semibold text-forest">Crop Health</div>
             <div className="text-[11px] text-stone flex items-center gap-1">
               <span className="live-dot inline-block w-1.5 h-1.5 rounded-full bg-sprout" />
               {allOptimal ? 'All farms healthy' : 'Needs attention'}
@@ -163,23 +163,23 @@ export function HomeScreen() {
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="grid grid-cols-2 gap-2.5 mb-[18px]"
+            className="grid grid-cols-2 gap-2 mb-[18px]"
           >
-            {[
-              { Icon: Thermometer, label: 'Temperature', value: `${iot.temp}°C`, ok: true },
-              { Icon: Droplets, label: 'Humidity', value: `${iot.rh}%`, ok: true },
-              { Icon: SoilIcon, label: 'Soil pH', value: iot.ph, ok: true },
-              { Icon: Sun, label: 'Light', value: `${iot.lux}k lux`, ok: iot.lux >= 17 },
-            ].map((item) => (
+            {([
+              { Icon: Thermometer, label: 'Temperature', value: `${iot.temp}°C`, ok: true, spark: 'pulse' as const },
+              { Icon: Droplets, label: 'Humidity', value: `${iot.rh}%`, ok: true, spark: 'wave' as const },
+              { Icon: SoilIcon, label: 'Soil pH', value: iot.ph, ok: true, spark: 'rise' as const },
+              { Icon: Sun, label: 'Light', value: `${iot.lux}k lux`, ok: iot.lux >= 17, spark: 'sun' as const },
+            ]).map((item) => (
               <motion.div key={item.label} variants={staggerItem}>
-                <IoTCard label={item.label} value={item.value} ok={item.ok} />
+                <IoTCard label={item.label} value={item.value} ok={item.ok} Icon={item.Icon} spark={item.spark} />
               </motion.div>
             ))}
           </motion.div>
 
           {/* Recent Activity */}
           <div className="flex items-center justify-between mb-3">
-            <div className="font-serif text-[17px] text-forest">Recent Activity</div>
+            <div className="text-[15px] font-semibold text-forest">Recent Activity</div>
             <button onClick={() => setScreen('activity')} className="text-xs text-leaf font-medium border-none bg-transparent cursor-pointer">
               See all →
             </button>

@@ -11,7 +11,7 @@ export function StatTile({ label, value, valueClass = 'text-forest', className }
   return (
     <div className={cn('bg-surface rounded-lg p-2', className)}>
       <div className="text-[9px] text-stone uppercase tracking-wider mb-0.5">{label}</div>
-      <div className={cn('text-[13px] font-medium', valueClass)}>{value}</div>
+      <div className={cn('font-serif text-[15px] leading-none', valueClass)}>{value}</div>
     </div>
   )
 }

@@ -25,7 +25,7 @@ export function MarketListingRow({ listing: l, onClick }: MarketListingRowProps)
         </div>
       </div>
       <div>
-        <div className="text-sm font-semibold text-forest text-right">{l.price}</div>
+        <div className="font-serif text-base text-forest text-right">{l.price}</div>
         <div className={cn('text-[11px] text-right mt-px inline-flex items-center gap-1 justify-end w-full', l.up ? 'text-sprout' : 'text-danger')}>
           <Trend className="size-3" />
           {l.chg}

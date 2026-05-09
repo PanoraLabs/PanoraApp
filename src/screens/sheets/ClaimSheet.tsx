@@ -2,11 +2,11 @@ import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
 
 export function ClaimSheet() {
-  const { closeSheet, showToast } = useAppStore()
+  const { closeSheet, showResult } = useAppStore()
 
   return (
     <BottomSheet id="claim">
-      <div className="font-serif text-xl text-forest mb-[18px]">Claim your profit</div>
+      <div className="text-lg font-semibold text-forest mb-[18px]">Claim your profit</div>
 
       <div className="bg-mist rounded-2xl p-5 text-center mb-4">
         <div className="text-xs text-stone mb-1">Available to claim</div>
@@ -38,7 +38,15 @@ export function ClaimSheet() {
       </div>
 
       <button
-        onClick={() => { closeSheet(); showToast('Rp 1,820,000 claimed') }}
+        onClick={() => {
+          closeSheet()
+          showResult({
+            kind: 'success',
+            title: 'Profit claimed',
+            message: 'Rp 1,820,000 transferred to your account balance.',
+            primaryLabel: 'Great',
+          })
+        }}
         className="w-full py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"
       >
         Confirm Claim

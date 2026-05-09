@@ -3,11 +3,11 @@ import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
 
 export function BuySheet() {
-  const { closeSheet, showToast } = useAppStore()
+  const { closeSheet, showResult } = useAppStore()
 
   return (
     <BottomSheet id="buy">
-      <div className="font-serif text-xl text-forest mb-[18px]">Buy this vault share</div>
+      <div className="text-lg font-semibold text-forest mb-[18px]">Buy this vault share</div>
 
       <div className="bg-surface rounded-[14px] p-3.5 mb-4">
         <div className="text-xs text-stone mb-1">Red Chili · Subang · 25 days to harvest</div>
@@ -40,7 +40,14 @@ export function BuySheet() {
       </div>
 
       <button
-        onClick={() => { closeSheet(); showToast('Share purchased') }}
+        onClick={() => {
+          closeSheet()
+          showResult({
+            kind: 'success',
+            title: 'Share purchased',
+            message: 'You now hold the Red Chili · Subang share. Profit will arrive at harvest.',
+          })
+        }}
         className="w-full py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"
       >
         Buy Share

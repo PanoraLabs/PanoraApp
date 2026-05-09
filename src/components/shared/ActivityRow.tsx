@@ -17,7 +17,7 @@ export function ActivityRow({ item: a, compactNeutral = false }: ActivityRowProp
         <div className="text-[11px] text-stone">{a.sub}</div>
       </div>
       <div>
-        <div className={cn('text-sm font-semibold text-right', a.pos ? 'text-sprout' : a.neutral ? neutralAmtClass : 'text-ink')}>
+        <div className={cn('font-serif text-base text-right', a.pos ? 'text-sprout' : a.neutral ? neutralAmtClass : 'text-ink')}>
           {a.amt}
         </div>
         <div className="text-[10px] text-stone text-right mt-px">{a.date}</div>

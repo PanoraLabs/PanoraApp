@@ -30,7 +30,7 @@ export function PositionRow({ position: p, onClick }: PositionRowProps) {
         </div>
       </div>
       <div className="text-right">
-        <div className="text-sm font-semibold text-forest">{p.val}</div>
+        <div className="font-serif text-base text-forest">{p.val}</div>
         <div className={cn('text-[11px] mt-px', p.profitColor)}>{p.profit}</div>
       </div>
     </motion.div>

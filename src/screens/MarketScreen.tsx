@@ -21,11 +21,13 @@ export function MarketScreen() {
                 <span className="live-dot inline-block w-1.5 h-1.5 rounded-full bg-sprout mr-1 align-middle" />
                 Live now
               </div>
-              <div className="font-serif text-[17px] text-white">38 shares for sale</div>
+              <div className="text-[15px] font-semibold text-white">
+                <span className="font-serif text-[17px]">38</span> shares for sale
+              </div>
             </div>
             <div className="text-right">
               <div className="text-[10px] text-white/40 mb-0.5">Today's volume</div>
-              <div className="text-base font-semibold text-sprout">Rp 142M</div>
+              <div className="font-serif text-base text-sprout">Rp 142M</div>
             </div>
           </div>
 
@@ -37,7 +39,7 @@ export function MarketScreen() {
             </div>
           </div>
 
-          <div className="font-serif text-[17px] text-forest mb-3">Available now</div>
+          <div className="text-[15px] font-semibold text-forest mb-3">Available now</div>
 
           <motion.div variants={staggerContainer} initial="initial" animate="animate">
             {listings.map((l) => (

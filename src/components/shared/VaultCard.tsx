@@ -25,7 +25,7 @@ export function VaultCard({ vault: v, onClick }: VaultCardProps) {
         </StatusBadge>
       </div>
       <div className="text-[10px] text-stone uppercase tracking-wider mb-0.5">{v.type}</div>
-      <div className="font-serif text-[15px] text-forest mb-0.5">{v.name}</div>
+      <div className="text-[15px] font-semibold text-forest mb-0.5">{v.name}</div>
       <div className="text-[11px] text-stone mb-3 inline-flex items-center gap-1">
         <MapPin className="size-3" />
         {v.loc}
@@ -36,7 +36,7 @@ export function VaultCard({ vault: v, onClick }: VaultCardProps) {
       </div>
       <div className="flex justify-between text-[10px] text-stone mb-1">
         <span>{v.daysLeft}</span>
-        <span className={`font-semibold ${v.gold ? 'text-gold' : 'text-forest'}`}>{v.pct}%</span>
+        <span className={`font-serif ${v.gold ? 'text-gold' : 'text-forest'}`}>{v.pct}%</span>
       </div>
       <ProgressBar pct={v.pct} variant={v.gold ? 'gold' : 'leaf'} />
     </motion.div>

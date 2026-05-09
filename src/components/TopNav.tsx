@@ -20,7 +20,7 @@ export function TopNav({ title, action, showBack = true }: TopNavProps) {
           <ChevronLeft className="size-[18px]" strokeWidth={2.4} />
         </button>
       )}
-      <div className="font-serif text-[17px] text-forest flex-1">{title}</div>
+      <div className="text-[15px] font-semibold text-forest flex-1">{title}</div>
       {action && (
         <button
           onClick={action.onClick}

@@ -1,13 +1,26 @@
 import { motion } from 'framer-motion'
+import {
+  Languages,
+  Coins as CurrencyIcon,
+  Bell,
+  ShieldCheck,
+  Wallet as WalletIcon,
+  CloudUpload,
+  HelpCircle,
+  FileText,
+  Info,
+  LogOut,
+} from 'lucide-react'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useClaimables, useParticipationTokens, useWallet } from '@/hooks/useWallet'
 import { ClaimableRow } from '@/components/shared/ClaimableRow'
 import { PTRow } from '@/components/shared/PTRow'
+import { SettingsRow, SettingsGroup } from '@/components/shared/SettingsRow'
 import { staggerContainer, staggerItem } from '@/motion/variants'
 
 export function WalletScreen() {
-  const { openSheet, showToast } = useAppStore()
+  const { openSheet, showToast, showResult } = useAppStore()
   const { address, balances } = useWallet()
   const claimables = useClaimables()
   const tokens = useParticipationTokens()
@@ -22,7 +35,7 @@ export function WalletScreen() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">My Account</div>
-                <div className="font-serif text-xl text-white">Agung Wibowo</div>
+                <div className="text-xl font-semibold text-white">Agung Wibowo</div>
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-white/40 mb-0.5">Wallet ID</div>
@@ -41,13 +54,26 @@ export function WalletScreen() {
 
             <div className="flex gap-2.5">
               <button
-                onClick={() => showToast('Deposit flow...')}
+                onClick={() =>
+                  showResult({
+                    kind: 'success',
+                    title: 'Deposit received',
+                    message: 'Rp 1,000,000 added to your account balance.',
+                  })
+                }
                 className="flex-1 py-2.5 rounded-[14px] bg-white/10 text-white font-sans text-[13px] font-semibold border-none cursor-pointer"
               >
                 Add Cash
               </button>
               <button
-                onClick={() => openSheet('claim')}
+                onClick={() =>
+                  showResult({
+                    kind: 'error',
+                    title: 'Cash out unavailable',
+                    message: 'No bank account is connected yet. Add a payout destination in Pengaturan first.',
+                    primaryLabel: 'Got it',
+                  })
+                }
                 className="flex-1 py-2.5 rounded-[14px] bg-white/10 text-white font-sans text-[13px] font-semibold border-none cursor-pointer"
               >
                 Cash Out
@@ -58,7 +84,7 @@ export function WalletScreen() {
           {/* Claimable */}
           {claimables.length > 0 && (
             <>
-              <div className="font-serif text-[17px] text-forest mb-3">Ready to Claim</div>
+              <div className="text-[15px] font-semibold text-forest mb-3">Ready to Claim</div>
               {claimables.map((c) => (
                 <ClaimableRow key={c.code} claimable={c} onClaim={() => openSheet('claim')} />
               ))}
@@ -66,7 +92,7 @@ export function WalletScreen() {
           )}
 
           {/* Vault Shares */}
-          <div className="font-serif text-[17px] text-forest mb-1">My Vault Shares</div>
+          <div className="text-[15px] font-semibold text-forest mb-1">My Vault Shares</div>
           <div className="text-[11px] text-stone mb-3">Your stake in each active vault. Sell anytime on the marketplace.</div>
           <motion.div
             variants={staggerContainer}
@@ -80,6 +106,78 @@ export function WalletScreen() {
               </motion.div>
             ))}
           </motion.div>
+
+          <div className="mt-6">
+            <SettingsGroup title="Preferensi">
+              <SettingsRow
+                Icon={Languages}
+                label="Language"
+                hint="Bahasa Indonesia"
+                trailing="ID"
+                onClick={() => showToast('Language settings')}
+              />
+              <SettingsRow
+                Icon={CurrencyIcon}
+                label="Currency"
+                hint="Indonesian Rupiah"
+                trailing="IDR"
+                onClick={() => showToast('Currency settings')}
+              />
+              <SettingsRow
+                Icon={Bell}
+                label="Notifications"
+                hint="Harvest, claims, market"
+                onClick={() => showToast('Notifications')}
+              />
+            </SettingsGroup>
+
+            <SettingsGroup title="Pengaturan">
+              <SettingsRow
+                Icon={ShieldCheck}
+                label="Security & PIN"
+                hint="Biometric, 6-digit PIN"
+                onClick={() => showToast('Security settings')}
+              />
+              <SettingsRow
+                Icon={WalletIcon}
+                label="Connected Wallet"
+                hint={address}
+                onClick={() => showToast('Wallet management')}
+              />
+              <SettingsRow
+                Icon={CloudUpload}
+                label="Backup & Recovery"
+                hint="Last backup 3 days ago"
+                onClick={() => showToast('Backup options')}
+              />
+            </SettingsGroup>
+
+            <SettingsGroup title="Lainnya">
+              <SettingsRow
+                Icon={HelpCircle}
+                label="Help & Support"
+                onClick={() => showToast('Help center')}
+              />
+              <SettingsRow
+                Icon={FileText}
+                label="Terms & Privacy"
+                onClick={() => showToast('Terms & privacy')}
+              />
+              <SettingsRow
+                Icon={Info}
+                label="About Panora"
+                trailing="v1.0"
+                onClick={() => showToast('About Panora')}
+              />
+              <SettingsRow
+                Icon={LogOut}
+                label="Log out"
+                tone="danger"
+                onClick={() => showToast('Logged out')}
+              />
+            </SettingsGroup>
+          </div>
+
           <div className="h-2" />
         </div>
       </div>

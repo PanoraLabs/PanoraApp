@@ -1,12 +1,19 @@
+import { useState } from 'react'
 import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
 
+const FLOOR = 10_000_000
+
 export function SellSheet() {
-  const { closeSheet, showToast } = useAppStore()
+  const { closeSheet, showResult } = useAppStore()
+  const [price, setPrice] = useState('10,850,000')
+
+  const parsed = parseInt(price.replace(/[^\d]/g, ''), 10) || 0
+  const fmt = (v: number) => 'Rp ' + v.toLocaleString('id-ID')
 
   return (
     <BottomSheet id="sell">
-      <div className="font-serif text-xl text-forest mb-[18px]">Sell my vault share</div>
+      <div className="text-lg font-semibold text-forest mb-[18px]">Sell my vault share</div>
 
       <div className="bg-surface rounded-[14px] p-3 mb-4">
         <div className="text-xs text-stone mb-0.5">Red Chili · Subang</div>
@@ -19,7 +26,8 @@ export function SellSheet() {
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-stone">Rp</span>
           <input
             className="w-full py-3 pl-11 pr-3.5 bg-surface border-[1.5px] border-input rounded-xl font-sans text-sm text-forest outline-none focus:border-leaf transition-colors"
-            defaultValue="10,850,000"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
           />
         </div>
         <div className="text-[10px] text-stone mt-1">Lowest price allowed: Rp 10,000,000 (your original investment)</div>
@@ -42,7 +50,22 @@ export function SellSheet() {
       </div>
 
       <button
-        onClick={() => { closeSheet(); showToast('Share listed for sale') }}
+        onClick={() => {
+          if (parsed < FLOOR) {
+            showResult({
+              kind: 'error',
+              title: 'Listing rejected',
+              message: `Asking price ${fmt(parsed)} is below the floor of ${fmt(FLOOR)}. Adjust your price and try again.`,
+            })
+            return
+          }
+          closeSheet()
+          showResult({
+            kind: 'success',
+            title: 'Listed for sale',
+            message: `Your share is on the marketplace at ${fmt(parsed)}. We'll notify you when a buyer takes it.`,
+          })
+        }}
         className="w-full py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"
       >
         List for Sale

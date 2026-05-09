@@ -63,7 +63,7 @@ export function PortfolioScreen() {
 
           {/* All Positions header */}
           <div className="flex items-center justify-between mb-3">
-            <div className="font-serif text-[17px] text-forest">My Investments</div>
+            <div className="text-[15px] font-semibold text-forest">My Investments</div>
             <div className="flex gap-1.5">
               {(['active', 'settled'] as const).map((tab) => (
                 <button
@@ -93,7 +93,7 @@ export function PortfolioScreen() {
 
           {/* Milestone Tracker */}
           <div className="flex items-center justify-between mb-3 mt-1.5">
-            <div className="font-serif text-[17px] text-forest">How my money is being used</div>
+            <div className="text-[15px] font-semibold text-forest">How my money is being used</div>
             <div className="text-[11px] text-stone">Red Chili · Subang</div>
           </div>
           <div className="bg-card-bg border border-border rounded-[18px] p-[18px] mb-3.5">

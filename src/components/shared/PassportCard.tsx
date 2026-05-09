@@ -15,7 +15,7 @@ export function PassportCard({ nft, onClick }: PassportCardProps) {
     >
       <div className="absolute -top-10 -right-10 w-[130px] h-[130px] rounded-full bg-white/7" />
       <div className="text-[10px] text-white/40 tracking-widest uppercase mb-1">Passport · {nft.id}</div>
-      <div className="font-serif text-[17px] text-white mb-3">{nft.name}</div>
+      <div className="text-[15px] font-semibold text-white mb-3">{nft.name}</div>
       <div className="grid grid-cols-2 gap-2">
         {nft.meta.map((m) => (
           <div key={m.label}>

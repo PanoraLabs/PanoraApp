@@ -34,7 +34,7 @@ export function ExploreVaultCard({ vault: v, onClick, onStake }: ExploreVaultCar
           <CropIcon crop={v.crop} size="lg" />
           <div>
             <div className="text-[10px] text-stone uppercase tracking-wider">{v.type}</div>
-            <div className="font-serif text-base text-forest">{v.name}</div>
+            <div className="text-base font-semibold text-forest">{v.name}</div>
             <div className="text-[11px] text-stone inline-flex items-center gap-1">
               <MapPin className="size-3" />
               {v.loc}
@@ -64,7 +64,7 @@ export function ExploreVaultCard({ vault: v, onClick, onStake }: ExploreVaultCar
         <>
           <div className="flex justify-between text-[10px] text-stone mb-1">
             <span>Funded</span>
-            <span className="font-semibold text-forest">{v.funded}%</span>
+            <span className="font-serif text-forest">{v.funded}%</span>
           </div>
           <ProgressBar pct={v.funded} variant={v.full ? 'stone' : 'leaf'} />
         </>

@@ -5,6 +5,7 @@ import { PhoneFrame } from '@/components/PhoneFrame'
 import { StatusBar } from '@/components/StatusBar'
 import { BottomNav } from '@/components/BottomNav'
 import { Toast } from '@/components/Toast'
+import { ResultModal } from '@/components/ResultModal'
 import { HomeScreen } from '@/screens/HomeScreen'
 import { ExploreScreen } from '@/screens/ExploreScreen'
 import { PortfolioScreen } from '@/screens/PortfolioScreen'
@@ -57,6 +58,7 @@ export default function App() {
         <VaultDetailSheet />
         <BuySheet />
         <SellSheet />
+        <ResultModal />
       </div>
       <BottomNav />
       <Toast />

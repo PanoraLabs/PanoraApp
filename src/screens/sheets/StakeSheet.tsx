@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/app-store'
 import { CropIcon } from '@/lib/icons'
 
 export function StakeSheet() {
-  const { closeSheet, showToast } = useAppStore()
+  const { closeSheet, showResult } = useAppStore()
   const [amount, setAmount] = useState(5000000)
 
   const profit = Math.round(amount * 0.18)
@@ -15,12 +15,12 @@ export function StakeSheet() {
 
   return (
     <BottomSheet id="stake">
-      <div className="font-serif text-xl text-forest mb-[18px]">Invest in this vault</div>
+      <div className="text-lg font-semibold text-forest mb-[18px]">Invest in this vault</div>
 
       <div className="bg-surface rounded-[14px] p-3 flex items-center gap-2.5 mb-4">
         <CropIcon crop="chili" size="lg" />
         <div>
-          <div className="text-[13px] font-medium text-forest">Red Chili · Subang</div>
+          <div className="text-[13px] font-semibold text-forest">Red Chili · Subang</div>
           <div className="text-[11px] text-stone">Greenhouse · West Java · Est. 18% · 90 days</div>
         </div>
       </div>
@@ -74,7 +74,22 @@ export function StakeSheet() {
       </div>
 
       <button
-        onClick={() => { closeSheet(); showToast('Investment confirmed') }}
+        onClick={() => {
+          if (amount < 500000) {
+            showResult({
+              kind: 'error',
+              title: 'Investment failed',
+              message: `Minimum investment is Rp 500,000. You entered ${fmt(amount)}.`,
+            })
+            return
+          }
+          closeSheet()
+          showResult({
+            kind: 'success',
+            title: 'Investment confirmed',
+            message: `${fmt(amount)} locked into Red Chili · Subang. Estimated total back ${fmt(total)} in 90 days.`,
+          })
+        }}
         className="w-full py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"
       >
         Confirm Investment
