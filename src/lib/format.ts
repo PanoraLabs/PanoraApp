@@ -24,3 +24,11 @@ export function shortenAddress(address: string, head = 4, tail = 4): string {
   if (address.length <= head + tail + 3) return address
   return `${address.slice(0, head)}...${address.slice(-tail)}`
 }
+
+export function formatShortDate(d = new Date()): string {
+  return d.toLocaleString('en-US', { month: 'short', day: 'numeric' })
+}
+
+export function formatMonthYear(d = new Date()): string {
+  return d.toLocaleString('en-US', { month: 'long', year: 'numeric' })
+}

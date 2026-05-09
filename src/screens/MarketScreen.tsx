@@ -22,7 +22,7 @@ export function MarketScreen() {
                 Live now
               </div>
               <div className="text-[15px] font-semibold text-white">
-                <span className="font-serif text-[17px]">38</span> shares for sale
+                <span className="font-serif text-[17px]">{listings.length}</span> shares for sale
               </div>
             </div>
             <div className="text-right">
@@ -44,7 +44,7 @@ export function MarketScreen() {
           <motion.div variants={staggerContainer} initial="initial" animate="animate">
             {listings.map((l) => (
               <motion.div key={l.code} variants={staggerItem}>
-                <MarketListingRow listing={l} onClick={() => openSheet('buy')} />
+                <MarketListingRow listing={l} onClick={() => openSheet('buy', { listingCode: l.code })} />
               </motion.div>
             ))}
           </motion.div>

@@ -92,7 +92,17 @@ export function ExploreScreen() {
                   <motion.button
                     key={v.name}
                     variants={staggerItem}
-                    onClick={() => openSheet(v.highlight ? 'stake' : 'vault-detail')}
+                    onClick={() =>
+                      openSheet(v.highlight ? 'stake' : 'vault-detail', {
+                        vaultCode: v.name,
+                        vaultSub: v.type,
+                        crop: v.crop,
+                        apyLabel: v.apy,
+                        daysLeftLabel: v.duration,
+                        loc: v.loc,
+                        pct: v.funded,
+                      })
+                    }
                     className={cn(
                       'shrink-0 w-[200px] text-left rounded-[16px] p-3.5 cursor-pointer border',
                       v.highlight
@@ -208,8 +218,29 @@ export function ExploreScreen() {
                 <motion.div key={v.name} variants={staggerItem}>
                   <ExploreVaultCard
                     vault={v}
-                    onClick={() => (v.highlight ? openSheet('stake') : openSheet('vault-detail'))}
-                    onStake={() => openSheet('stake')}
+                    onClick={() => {
+                      const ctx = {
+                        vaultCode: v.name,
+                        vaultSub: v.type,
+                        crop: v.crop,
+                        apyLabel: v.apy,
+                        daysLeftLabel: v.duration,
+                        loc: v.loc,
+                        pct: v.funded,
+                      }
+                      openSheet(v.highlight ? 'stake' : 'vault-detail', ctx)
+                    }}
+                    onStake={() =>
+                      openSheet('stake', {
+                        vaultCode: v.name,
+                        vaultSub: v.type,
+                        crop: v.crop,
+                        apyLabel: v.apy,
+                        daysLeftLabel: v.duration,
+                        loc: v.loc,
+                        pct: v.funded,
+                      })
+                    }
                   />
                 </motion.div>
               ))}

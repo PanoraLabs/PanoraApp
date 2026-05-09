@@ -1,5 +1,5 @@
-import { marketListings } from '@/data/listings'
+import { useDemoStore } from '@/store/demo-store'
 
 export function useMarketListings() {
-  return marketListings
+  return useDemoStore((s) => s.listings)
 }

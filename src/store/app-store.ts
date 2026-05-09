@@ -11,6 +11,22 @@ export interface ResultPayload {
   primaryLabel?: string
 }
 
+// Context passed when opening a sheet so it knows which entity to act on.
+// Optional fields let callers be lazy when the sheet's default is enough.
+export interface SheetContext {
+  vaultCode?: string
+  vaultSub?: string
+  crop?: string
+  apyLabel?: string
+  daysLeftLabel?: string
+  pct?: number
+  loc?: string
+  positionCode?: string
+  positionInvestedIdr?: number
+  listingCode?: string
+  claimableCode?: string
+}
+
 export interface StoredUser {
   id: string
   privyId: string
@@ -24,12 +40,13 @@ interface AppState {
   screen: Screen
   navTab: string
   sheet: Sheet
+  sheetContext: SheetContext | null
   toast: string | null
   result: ResultPayload | null
   user: StoredUser | null
   isLoadingProfile: boolean
   setScreen: (screen: Screen, tab?: string) => void
-  openSheet: (sheet: Sheet) => void
+  openSheet: (sheet: Sheet, context?: SheetContext) => void
   closeSheet: () => void
   showToast: (msg: string) => void
   hideToast: () => void
@@ -43,6 +60,7 @@ export const useAppStore = create<AppState>((set) => ({
   screen: 'home',
   navTab: 'home',
   sheet: null,
+  sheetContext: null,
   toast: null,
   result: null,
   user: null,
@@ -52,8 +70,8 @@ export const useAppStore = create<AppState>((set) => ({
       screen,
       navTab: tab ?? screen,
     }),
-  openSheet: (sheet) => set({ sheet }),
-  closeSheet: () => set({ sheet: null }),
+  openSheet: (sheet, context) => set({ sheet, sheetContext: context ?? null }),
+  closeSheet: () => set({ sheet: null, sheetContext: null }),
   showToast: (msg) => {
     set({ toast: msg })
     setTimeout(() => set({ toast: null }), 2800)

@@ -1,7 +1,8 @@
-import { activeVaults, exploreVaults, exploreFilters } from '@/data/vaults'
+import { exploreVaults, exploreFilters } from '@/data/vaults'
+import { useDemoStore } from '@/store/demo-store'
 
 export function useActiveVaults() {
-  return activeVaults
+  return useDemoStore((s) => s.activeVaults)
 }
 
 export function useExploreVaults() {

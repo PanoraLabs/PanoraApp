@@ -1,23 +1,58 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
+import { useDemoStore } from '@/store/demo-store'
+import { formatRupiah } from '@/lib/format'
 
-const FLOOR = 10_000_000
+function parseRupiah(s: string): number {
+  return parseInt(s.replace(/[^\d]/g, ''), 10) || 0
+}
 
 export function SellSheet() {
-  const { closeSheet, showResult } = useAppStore()
-  const [price, setPrice] = useState('10,850,000')
+  const closeSheet = useAppStore((s) => s.closeSheet)
+  const showResult = useAppStore((s) => s.showResult)
+  const sheetContext = useAppStore((s) => s.sheetContext)
+  const positions = useDemoStore((s) => s.positions)
+  const sell = useDemoStore((s) => s.sell)
 
-  const parsed = parseInt(price.replace(/[^\d]/g, ''), 10) || 0
-  const fmt = (v: number) => 'Rp ' + v.toLocaleString('id-ID')
+  // Default to first position if none specified.
+  const position = useMemo(
+    () =>
+      positions.find((p) => p.code === sheetContext?.positionCode) ?? positions[0] ?? null,
+    [positions, sheetContext?.positionCode]
+  )
+
+  const investedIdr = position ? parseRupiah(position.val) : 0
+  const suggested = Math.round(investedIdr * 1.085)
+  const [price, setPrice] = useState<string>(suggested ? suggested.toLocaleString('id-ID') : '')
+
+  if (!position) {
+    return (
+      <BottomSheet id="sell">
+        <div className="text-lg font-semibold text-forest mb-[18px]">Nothing to sell</div>
+        <div className="text-[13px] text-stone mb-4">You don't have any positions to list yet.</div>
+        <button
+          onClick={closeSheet}
+          className="w-full py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"
+        >
+          Close
+        </button>
+      </BottomSheet>
+    )
+  }
+
+  const parsed = parseRupiah(price)
+  const platformFee = Math.round(parsed * 0.01)
+  const insuranceFee = Math.round(parsed * 0.005)
+  const youReceive = Math.max(0, parsed - platformFee - insuranceFee)
 
   return (
     <BottomSheet id="sell">
       <div className="text-lg font-semibold text-forest mb-[18px]">Sell my vault share</div>
 
       <div className="bg-surface rounded-[14px] p-3 mb-4">
-        <div className="text-xs text-stone mb-0.5">Red Chili · Subang</div>
-        <div className="text-[13px] text-forest">Invested: Rp 10,000,000 · 25 days to harvest</div>
+        <div className="text-xs text-stone mb-0.5">{position.code}</div>
+        <div className="text-[13px] text-forest">Invested: {formatRupiah(investedIdr)} · {position.sub}</div>
       </div>
 
       <div className="mb-3.5">
@@ -30,40 +65,37 @@ export function SellSheet() {
             onChange={(e) => setPrice(e.target.value)}
           />
         </div>
-        <div className="text-[10px] text-stone mt-1">Lowest price allowed: Rp 10,000,000 (your original investment)</div>
+        <div className="text-[10px] text-stone mt-1">Lowest price allowed: {formatRupiah(investedIdr)} (your original investment)</div>
       </div>
 
       <div className="bg-mist rounded-xl p-3 mb-4">
         <div className="flex justify-between text-xs mb-1.5">
           <span className="text-stone">Platform fee (1%)</span>
-          <span>−Rp 108,500</span>
+          <span>−{formatRupiah(platformFee)}</span>
         </div>
         <div className="flex justify-between text-xs mb-1.5">
           <span className="text-stone">Insurance fee (0.5%)</span>
-          <span>−Rp 54,250</span>
+          <span>−{formatRupiah(insuranceFee)}</span>
         </div>
         <div className="h-px bg-forest/10 mb-2" />
         <div className="flex justify-between text-sm font-semibold">
           <span>You receive</span>
-          <span className="text-sprout">Rp 10,687,250</span>
+          <span className="text-sprout">{formatRupiah(youReceive)}</span>
         </div>
       </div>
 
       <button
         onClick={() => {
-          if (parsed < FLOOR) {
-            showResult({
-              kind: 'error',
-              title: 'Listing rejected',
-              message: `Asking price ${fmt(parsed)} is below the floor of ${fmt(FLOOR)}. Adjust your price and try again.`,
-            })
+          const result = sell({ positionCode: position.code, askPriceIdr: parsed })
+          if (!result.ok) {
+            showResult({ kind: 'error', title: 'Listing rejected', message: result.reason })
             return
           }
           closeSheet()
           showResult({
             kind: 'success',
             title: 'Listed for sale',
-            message: `Your share is on the marketplace at ${fmt(parsed)}. We'll notify you when a buyer takes it.`,
+            message: `Your share is on the marketplace at ${formatRupiah(parsed)}. We'll notify you when a buyer takes it.`,
           })
         }}
         className="w-full py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"

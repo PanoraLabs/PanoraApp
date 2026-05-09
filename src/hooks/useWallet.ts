@@ -1,5 +1,7 @@
-import { claimables, participationTokens, walletAddress, walletBalances } from '@/data/wallet'
 import { useUser } from '@/hooks/useUser'
+import { useDemoStore } from '@/store/demo-store'
+import { formatRupiahCompact } from '@/lib/format'
+import { walletAddress as fallbackAddress } from '@/data/wallet'
 
 function shortenAddress(addr: string, head = 4, tail = 4): string {
   if (addr.length <= head + tail + 3) return addr
@@ -8,14 +10,24 @@ function shortenAddress(addr: string, head = 4, tail = 4): string {
 
 export function useWallet() {
   const { user } = useUser()
-  const address = user?.walletAddress ? shortenAddress(user.walletAddress) : walletAddress
-  return { address, fullAddress: user?.walletAddress ?? null, balances: walletBalances }
+  const cashIdr = useDemoStore((s) => s.cashIdr)
+  const feesSol = useDemoStore((s) => s.feesSol)
+  const address = user?.walletAddress ? shortenAddress(user.walletAddress) : fallbackAddress
+  return {
+    address,
+    fullAddress: user?.walletAddress ?? null,
+    balances: {
+      cash: formatRupiahCompact(cashIdr),
+      cashLabel: 'IDR',
+      fees: `${feesSol.toFixed(2)} SOL`,
+    },
+  }
 }
 
 export function useClaimables() {
-  return claimables
+  return useDemoStore((s) => s.claimables)
 }
 
 export function useParticipationTokens() {
-  return participationTokens
+  return useDemoStore((s) => s.participationTokens)
 }

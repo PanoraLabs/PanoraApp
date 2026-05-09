@@ -1,7 +1,8 @@
-import { positions, portfolioAllocations, portfolioMilestones } from '@/data/positions'
+import { portfolioAllocations, portfolioMilestones } from '@/data/positions'
+import { useDemoStore } from '@/store/demo-store'
 
 export function usePositions() {
-  return positions
+  return useDemoStore((s) => s.positions)
 }
 
 export function usePortfolioAllocations() {

@@ -93,7 +93,11 @@ export function WalletScreen() {
             <>
               <div className="text-[15px] font-semibold text-forest mb-3">Ready to Claim</div>
               {claimables.map((c) => (
-                <ClaimableRow key={c.code} claimable={c} onClaim={() => openSheet('claim')} />
+                <ClaimableRow
+                  key={c.code}
+                  claimable={c}
+                  onClaim={() => openSheet('claim', { claimableCode: c.code })}
+                />
               ))}
             </>
           )}
@@ -109,7 +113,7 @@ export function WalletScreen() {
           >
             {tokens.map((t) => (
               <motion.div key={t.code} variants={staggerItem}>
-                <PTRow token={t} onList={() => openSheet('sell')} />
+                <PTRow token={t} onList={() => openSheet('sell', { positionCode: t.code })} />
               </motion.div>
             ))}
           </motion.div>

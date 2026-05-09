@@ -1,9 +1,9 @@
-import { recentActivity, activityHistory } from '@/data/activity'
+import { useDemoStore } from '@/store/demo-store'
 
 export function useRecentActivity() {
-  return recentActivity
+  return useDemoStore((s) => s.recentActivity)
 }
 
 export function useActivityHistory() {
-  return activityHistory
+  return useDemoStore((s) => s.activityHistory)
 }
