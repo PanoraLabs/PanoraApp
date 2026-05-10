@@ -82,8 +82,10 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
   async function handleGoogle() {
     setError(null)
     try {
+      sessionStorage.setItem('panora:pending-oauth', 'google')
       await initOAuth({ provider: 'google' })
     } catch (e) {
+      sessionStorage.removeItem('panora:pending-oauth')
       setError(humanizeError(e))
     }
   }

@@ -18,6 +18,21 @@ export function AuthGate({ children }: AuthGateProps) {
   const { isReady, isAuthenticated, hasProfile, isLoadingProfile, walletAddress, signOut } =
     useUser()
   const [step, setStep] = useState<UnauthedStep>('welcome')
+  const [pendingOAuth, setPendingOAuth] = useState<boolean>(() =>
+    typeof window !== 'undefined' && sessionStorage.getItem('panora:pending-oauth') !== null
+  )
+
+  useEffect(() => {
+    if (isAuthenticated && pendingOAuth) {
+      sessionStorage.removeItem('panora:pending-oauth')
+      setPendingOAuth(false)
+    }
+  }, [isAuthenticated, pendingOAuth])
+
+  function cancelPendingOAuth() {
+    sessionStorage.removeItem('panora:pending-oauth')
+    setPendingOAuth(false)
+  }
 
   // Diagnostics
   const privy = usePrivy()
@@ -46,6 +61,15 @@ export function AuthGate({ children }: AuthGateProps) {
   }
 
   if (!isAuthenticated) {
+    if (pendingOAuth) {
+      return (
+        <RecoverableSplash
+          subtitle="Signing you in..."
+          escapeLabel="Cancel"
+          onSignOut={async () => cancelPendingOAuth()}
+        />
+      )
+    }
     if (step === 'welcome') {
       return <WelcomeScreen onContinue={() => setStep('login')} />
     }
@@ -81,9 +105,11 @@ export function AuthGate({ children }: AuthGateProps) {
 function RecoverableSplash({
   subtitle,
   onSignOut,
+  escapeLabel = 'Sign out and try again',
 }: {
   subtitle: string
   onSignOut: () => Promise<void>
+  escapeLabel?: string
 }) {
   const [showEscape, setShowEscape] = useState(false)
 
@@ -102,14 +128,13 @@ function RecoverableSplash({
           className="absolute inset-x-0 bottom-10 flex flex-col items-center px-8 z-10"
         >
           <div className="text-[12px] text-white/55 text-center mb-3 leading-relaxed">
-            Taking longer than usual. Check the browser console for details, or sign out and try
-            again.
+            Taking longer than usual. Check the browser console for details, or try again.
           </div>
           <button
             onClick={() => onSignOut().catch(console.error)}
             className="px-5 py-2.5 rounded-[14px] bg-white/15 text-white font-sans text-[13px] font-semibold border-none cursor-pointer active:bg-white/25 transition-colors"
           >
-            Sign out and try again
+            {escapeLabel}
           </button>
         </motion.div>
       )}
