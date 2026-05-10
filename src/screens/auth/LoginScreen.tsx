@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, Mail } from 'lucide-react'
-import { useLoginWithEmail, useLoginWithOAuth } from '@privy-io/react-auth'
+import { useLoginWithEmail, usePrivy } from '@privy-io/react-auth'
 
 interface LoginScreenProps {
   onBack: () => void
@@ -17,13 +17,13 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
   const [resendIn, setResendIn] = useState(0)
 
   const { sendCode, loginWithCode, state: emailState } = useLoginWithEmail()
-  const { initOAuth, loading: oauthLoading } = useLoginWithOAuth()
+  const { login } = usePrivy()
+  const [oauthBusy, setOauthBusy] = useState(false)
 
   const codeInputRef = useRef<HTMLInputElement>(null)
 
   const isSending = emailState.status === 'sending-code'
   const isSubmitting = emailState.status === 'submitting-code'
-  const oauthBusy = oauthLoading
 
   useEffect(() => {
     if (step === 'verify' && codeInputRef.current) {
@@ -79,13 +79,15 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
     }
   }
 
-  async function handleGoogle() {
+  function handleGoogle() {
     setError(null)
+    setOauthBusy(true)
     try {
       sessionStorage.setItem('panora:pending-oauth', 'google')
-      await initOAuth({ provider: 'google' })
+      login({ loginMethods: ['google'] })
     } catch (e) {
       sessionStorage.removeItem('panora:pending-oauth')
+      setOauthBusy(false)
       setError(humanizeError(e))
     }
   }
