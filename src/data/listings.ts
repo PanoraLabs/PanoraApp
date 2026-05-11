@@ -7,47 +7,33 @@ export interface MarketListing {
   price: string
   chg: string
   up: boolean
+  owned?: boolean
 }
 
+// Seed marketplace — three other-user listings the demo user can buy from.
 export const marketListings: MarketListing[] = [
   {
     crop: 'chili',
     code: 'Red Chili · Subang',
-    day: '0 days to harvest · Greenhouse',
-    price: '$0',
-    chg: '+0% vs entry',
+    day: '45 days to harvest · Greenhouse',
+    price: '$1,200',
+    chg: '+12% vs entry',
     up: true,
   },
   {
     crop: 'coffee',
     code: 'Toraja Arabica',
-    day: '0 days to harvest · Coffee',
-    price: '$0',
-    chg: '+0% vs entry',
-    up: true,
-  },
-  {
-    crop: 'shallot',
-    code: 'Shallot · Brebes',
-    day: '0 days to harvest · Greenhouse',
-    price: '$0',
-    chg: '+0% vs entry',
+    day: '120 days to harvest · Coffee',
+    price: '$2,800',
+    chg: '+8% vs entry',
     up: true,
   },
   {
     crop: 'rice',
     code: 'Karawang Rice',
-    day: '0 days to harvest · Grains',
-    price: '$0',
-    chg: '+0% vs entry',
-    up: true,
-  },
-  {
-    crop: 'vanilla',
-    code: 'Vanilla · Temanggung',
-    day: '0 days to harvest · Spice',
-    price: '$0',
-    chg: '+0% vs entry',
+    day: '60 days to harvest · Grains',
+    price: '$650',
+    chg: '+5% vs entry',
     up: true,
   },
 ]

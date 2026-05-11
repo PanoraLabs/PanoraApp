@@ -32,3 +32,13 @@ export function formatShortDate(d = new Date()): string {
 export function formatMonthYear(d = new Date()): string {
   return d.toLocaleString('en-US', { month: 'long', year: 'numeric' })
 }
+
+// Parse compact USD strings like "$10M", "$1.8k", "$10,000" back to a number.
+export function parseUsd(s: string): number {
+  if (!s) return 0
+  const trimmed = s.replace(/^\$\s*/, '').replace(/[+−-]/g, '').trim()
+  if (/M$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000_000)
+  if (/K$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000)
+  if (/B$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000_000_000)
+  return parseInt(trimmed.replace(/[^\d]/g, ''), 10) || 0
+}

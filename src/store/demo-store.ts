@@ -15,11 +15,13 @@ import {
   type ActivityGroup,
   type ActivityItem,
 } from '@/data/activity'
-import { formatUsd, formatUsdCompact, formatShortDate, formatMonthYear } from '@/lib/format'
+import { formatUsd, formatUsdCompact, formatShortDate, formatMonthYear, parseUsd } from '@/lib/format'
 
 const SEED_CASH_USD = 0
 const SEED_FEES_SOL = 0
 const MIN_STAKE_USD = 1
+const MIN_CASH_OP_USD = 1
+const MAX_CASH_OP_USD = 10_000_000
 
 type DemoEntities = {
   cashUsd: number
@@ -47,12 +49,16 @@ type StakeInput = {
 
 type ClaimResult = { amountUsd: number; code: string }
 type SellInput = { positionCode: string; askPriceUsd: number }
+type CashInput = { amountUsd: number; source?: string }
 
 interface DemoState extends DemoEntities {
   stake: (input: StakeInput) => { ok: true } | { ok: false; reason: string }
   claim: (claimableCode: string) => { ok: true; result: ClaimResult } | { ok: false; reason: string }
   buy: (listingCode: string) => { ok: true; totalCostUsd: number } | { ok: false; reason: string }
   sell: (input: SellInput) => { ok: true } | { ok: false; reason: string }
+  addCash: (input: CashInput) => { ok: true } | { ok: false; reason: string }
+  withdraw: (input: CashInput) => { ok: true } | { ok: false; reason: string }
+  cancelListing: (listingCode: string) => { ok: true } | { ok: false; reason: string }
   reset: () => void
 }
 
@@ -68,15 +74,6 @@ function seed(): DemoEntities {
     recentActivity: structuredClone(seedRecent),
     activityHistory: structuredClone(seedHistory),
   }
-}
-
-function parseUsd(s: string): number {
-  // "$10M" / "$1.8M" / "$10,000,000" → number
-  const trimmed = s.replace(/^\$\s*/, '').replace(/[+−-]/g, '').trim()
-  if (/M$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000_000)
-  if (/K$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000)
-  if (/B$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000_000_000)
-  return parseInt(trimmed.replace(/[^\d]/g, ''), 10) || 0
 }
 
 function logActivity(state: DemoEntities, item: ActivityItem): Pick<DemoEntities, 'recentActivity' | 'activityHistory'> {
@@ -109,21 +106,34 @@ export const useDemoStore = create<DemoState>()(
           }
         }
 
+        const apyPct = parseFloat(input.apyLabel) || 0
+        const estProfit = Math.round(input.amountUsd * (apyPct / 100))
+        const profitLabel = estProfit > 0
+          ? `+${formatUsdCompact(estProfit)} est.`
+          : input.daysLeftLabel
+
         const positions = [...state.positions]
         const existingPos = positions.findIndex((p) => p.code === input.vaultCode)
         if (existingPos >= 0) {
           const prev = positions[existingPos]
           const prevVal = parseUsd(prev.val)
-          positions[existingPos] = { ...prev, val: formatUsdCompact(prevVal + input.amountUsd) }
+          const newVal = prevVal + input.amountUsd
+          const newEst = Math.round(newVal * (apyPct / 100))
+          positions[existingPos] = {
+            ...prev,
+            val: formatUsdCompact(newVal),
+            profit: newEst > 0 ? `+${formatUsdCompact(newEst)} est.` : prev.profit,
+            profitColor: 'text-sprout',
+          }
         } else {
           positions.push({
             crop: input.crop,
             code: input.vaultCode,
             sub: input.vaultSub,
             val: formatUsdCompact(input.amountUsd),
-            profit: input.daysLeftLabel,
+            profit: profitLabel,
             pct: input.pct,
-            profitColor: 'text-gold',
+            profitColor: estProfit > 0 ? 'text-sprout' : 'text-gold',
             gold: input.pct < 50,
           })
         }
@@ -298,6 +308,7 @@ export const useDemoStore = create<DemoState>()(
           price: formatUsd(input.askPriceUsd),
           chg: `${chgPct >= 0 ? '+' : '−'}${Math.abs(chgPct).toFixed(1)}% vs entry`,
           up: chgPct >= 0,
+          owned: true,
         }
 
         const listings = [...state.listings]
@@ -324,11 +335,87 @@ export const useDemoStore = create<DemoState>()(
         return { ok: true }
       },
 
+      addCash: (input) => {
+        const state = get()
+        if (!Number.isFinite(input.amountUsd) || input.amountUsd < MIN_CASH_OP_USD) {
+          return { ok: false, reason: `Minimum top up is ${formatUsd(MIN_CASH_OP_USD)}.` }
+        }
+        if (input.amountUsd > MAX_CASH_OP_USD) {
+          return { ok: false, reason: `Maximum top up is ${formatUsd(MAX_CASH_OP_USD)} per transaction.` }
+        }
+
+        const activityItem: ActivityItem = {
+          action: 'profit',
+          name: 'Cash added',
+          sub: input.source ?? 'Bank transfer',
+          amt: `+${formatUsdCompact(input.amountUsd)}`,
+          pos: true,
+          date: formatShortDate(),
+        }
+
+        set({
+          cashUsd: state.cashUsd + input.amountUsd,
+          ...logActivity(state, activityItem),
+        })
+        return { ok: true }
+      },
+
+      withdraw: (input) => {
+        const state = get()
+        if (!Number.isFinite(input.amountUsd) || input.amountUsd < MIN_CASH_OP_USD) {
+          return { ok: false, reason: `Minimum withdrawal is ${formatUsd(MIN_CASH_OP_USD)}.` }
+        }
+        if (input.amountUsd > state.cashUsd) {
+          return {
+            ok: false,
+            reason: `Insufficient cash. Available ${formatUsd(state.cashUsd)}, you tried ${formatUsd(input.amountUsd)}.`,
+          }
+        }
+
+        const activityItem: ActivityItem = {
+          action: 'milestone',
+          name: 'Cash withdrawn',
+          sub: input.source ?? 'Bank transfer',
+          amt: `−${formatUsdCompact(input.amountUsd)}`,
+          pos: false,
+          date: formatShortDate(),
+        }
+
+        set({
+          cashUsd: state.cashUsd - input.amountUsd,
+          ...logActivity(state, activityItem),
+        })
+        return { ok: true }
+      },
+
+      cancelListing: (listingCode) => {
+        const state = get()
+        const target = state.listings.find((l) => l.code === listingCode)
+        if (!target) return { ok: false, reason: 'Listing not found.' }
+        if (!target.owned) return { ok: false, reason: 'You can only cancel your own listings.' }
+
+        const listings = state.listings.filter((l) => l.code !== listingCode)
+        const activityItem: ActivityItem = {
+          action: 'milestone',
+          name: 'Listing cancelled',
+          sub: `${target.code} · ${target.price}`,
+          amt: 'Removed',
+          neutral: true,
+          date: formatShortDate(),
+        }
+
+        set({
+          listings,
+          ...logActivity(state, activityItem),
+        })
+        return { ok: true }
+      },
+
       reset: () => set(seed()),
     }),
     {
       name: 'panora-demo-v2',
-      version: 2,
+      version: 3,
       // Only persist the entity state, not actions
       partialize: (s): DemoEntities => ({
         cashUsd: s.cashUsd,

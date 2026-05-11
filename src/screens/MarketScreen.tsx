@@ -2,12 +2,16 @@ import { motion } from 'framer-motion'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
 import { useMarketListings } from '@/hooks/useMarket'
+import { useDemoStore } from '@/store/demo-store'
 import { MarketListingRow } from '@/components/shared/MarketListingRow'
 import { staggerContainer, staggerItem } from '@/motion/variants'
+import { formatUsdCompact, parseUsd } from '@/lib/format'
 
 export function MarketScreen() {
-  const { openSheet } = useAppStore()
+  const { openSheet, showResult, showToast } = useAppStore()
   const listings = useMarketListings()
+  const cancelListing = useDemoStore((s) => s.cancelListing)
+  const totalVolumeUsd = listings.reduce((sum, l) => sum + parseUsd(l.price), 0)
 
   return (
     <div className="flex flex-col h-full bg-surface">
@@ -26,8 +30,10 @@ export function MarketScreen() {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-[10px] text-white/40 mb-0.5">Today's volume</div>
-              <div className="font-serif text-base text-sprout">$0</div>
+              <div className="text-[10px] text-white/40 mb-0.5">Listed volume</div>
+              <div className="font-serif text-base text-sprout">
+                {totalVolumeUsd > 0 ? formatUsdCompact(totalVolumeUsd) : '$0'}
+              </div>
             </div>
           </div>
 
@@ -44,7 +50,18 @@ export function MarketScreen() {
           <motion.div variants={staggerContainer} initial="initial" animate="animate">
             {listings.map((l) => (
               <motion.div key={l.code} variants={staggerItem}>
-                <MarketListingRow listing={l} onClick={() => openSheet('buy', { listingCode: l.code })} />
+                <MarketListingRow
+                  listing={l}
+                  onClick={() => openSheet('buy', { listingCode: l.code })}
+                  onCancel={() => {
+                    const result = cancelListing(l.code)
+                    if (!result.ok) {
+                      showResult({ kind: 'error', title: 'Cancel failed', message: result.reason })
+                      return
+                    }
+                    showToast(`Listing removed: ${l.code}`)
+                  }}
+                />
               </motion.div>
             ))}
           </motion.div>

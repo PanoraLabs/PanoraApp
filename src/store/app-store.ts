@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 
 export type Screen = 'home' | 'explore' | 'portfolio' | 'market' | 'activity' | 'wallet' | 'passport'
-export type Sheet = 'stake' | 'claim' | 'vault-detail' | 'buy' | 'sell' | null
+export type Sheet = 'stake' | 'claim' | 'vault-detail' | 'buy' | 'sell' | 'cash' | null
+export type CashMode = 'add' | 'withdraw'
 
 export type ResultKind = 'success' | 'error'
 export interface ResultPayload {
@@ -25,6 +26,7 @@ export interface SheetContext {
   positionInvestedIdr?: number
   listingCode?: string
   claimableCode?: string
+  cashMode?: CashMode
 }
 
 export interface StoredUser {

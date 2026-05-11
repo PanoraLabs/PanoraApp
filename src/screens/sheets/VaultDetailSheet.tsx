@@ -1,30 +1,57 @@
+import { useMemo } from 'react'
 import { Thermometer, Droplets, Sprout, Sun } from 'lucide-react'
 import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
-import { CropIcon } from '@/lib/icons'
+import { useDemoStore } from '@/store/demo-store'
+import { useIoTFeed } from '@/hooks/useHome'
+import { CropIcon, type CropKey } from '@/lib/icons'
 import { StatusBadge } from '@/components/shared/StatusBadge'
+import { formatUsd, parseUsd } from '@/lib/format'
+import { exploreVaults } from '@/data/vaults'
 
 export function VaultDetailSheet() {
-  const { closeSheet, openSheet } = useAppStore()
+  const { closeSheet, openSheet, sheetContext } = useAppStore()
+  const positions = useDemoStore((s) => s.positions)
+  const activeVaults = useDemoStore((s) => s.activeVaults)
+  const iot = useIoTFeed()
+
+  const vault = useMemo(() => {
+    const code = sheetContext?.vaultCode
+    const active = activeVaults.find((v) => v.name === code)
+    const position = positions.find((p) => p.code === code)
+    const explore = exploreVaults.find((v) => v.name === code)
+
+    const crop: CropKey = (sheetContext?.crop as CropKey) ?? active?.crop ?? position?.crop ?? explore?.crop ?? 'chili'
+    const name = code ?? explore?.name ?? 'Vault detail'
+    const sub = sheetContext?.vaultSub ?? active?.type ?? explore?.type ?? '—'
+    const apyLabel = sheetContext?.apyLabel ?? active?.apy ?? explore?.apy ?? '—'
+    const daysLeftLabel = sheetContext?.daysLeftLabel ?? active?.daysLeft ?? explore?.duration ?? '—'
+    const investedUsd = position ? parseUsd(position.val) : 0
+    const pct = sheetContext?.pct ?? active?.pct ?? explore?.funded ?? 0
+    const status = active?.status ?? (explore?.status === 'Sold out' ? 'Sold out' : 'Open')
+    const hasPosition = !!position
+
+    return { crop, name, sub, apyLabel, daysLeftLabel, investedUsd, pct, status, hasPosition }
+  }, [sheetContext, activeVaults, positions])
 
   return (
     <BottomSheet id="vault-detail">
       <div className="flex items-center gap-3 mb-[18px]">
-        <CropIcon crop="chili" size="xl" />
-        <div>
-          <div className="text-[10px] text-stone uppercase tracking-wider mb-0.5">Greenhouse · High Value</div>
-          <div className="text-lg font-semibold text-forest">Red Chili · Subang</div>
+        <CropIcon crop={vault.crop} size="xl" />
+        <div className="min-w-0">
+          <div className="text-[10px] text-stone uppercase tracking-wider mb-0.5 truncate">{vault.sub}</div>
+          <div className="text-lg font-semibold text-forest truncate">{vault.name}</div>
         </div>
         <span className="ml-auto">
-          <StatusBadge tone="leaf-soft">Growing</StatusBadge>
+          <StatusBadge tone="leaf-soft">{vault.status}</StatusBadge>
         </span>
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-4">
         {[
-          { label: 'You invested', val: '$0' },
-          { label: 'Est. return', val: '0%', color: 'text-sprout' },
-          { label: 'Days left', val: '0' },
+          { label: 'You invested', val: vault.investedUsd > 0 ? formatUsd(vault.investedUsd) : '—' },
+          { label: 'Est. return', val: vault.apyLabel, color: 'text-sprout' },
+          { label: 'Time left', val: vault.daysLeftLabel },
         ].map((m) => (
           <div key={m.label} className="bg-surface rounded-lg p-2">
             <div className="text-[9px] text-stone uppercase tracking-wider mb-0.5">{m.label}</div>
@@ -36,10 +63,13 @@ export function VaultDetailSheet() {
       <div className="mb-4">
         <div className="flex justify-between text-[10px] text-stone mb-1">
           <span>Progress</span>
-          <span className="font-serif text-forest">0%</span>
+          <span className="font-serif text-forest">{vault.pct}%</span>
         </div>
         <div className="h-1.5 bg-surface rounded-full overflow-hidden">
-          <div className="h-full rounded-full bg-gradient-to-r from-leaf to-sprout" style={{ width: '0%' }} />
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-leaf to-sprout"
+            style={{ width: `${Math.min(100, Math.max(0, vault.pct))}%` }}
+          />
         </div>
       </div>
 
@@ -62,10 +92,10 @@ export function VaultDetailSheet() {
         </div>
         <div className="grid grid-cols-4 gap-2">
           {[
-            { Icon: Thermometer, val: '0°C', label: 'Temp' },
-            { Icon: Droplets, val: '0%', label: 'Humidity' },
-            { Icon: Sprout, val: '0', label: 'Soil pH' },
-            { Icon: Sun, val: '0k', label: 'Light', color: 'text-amber' },
+            { Icon: Thermometer, val: `${iot.temp}°C`, label: 'Temp' },
+            { Icon: Droplets, val: `${iot.rh}%`, label: 'Humidity' },
+            { Icon: Sprout, val: iot.ph, label: 'Soil pH' },
+            { Icon: Sun, val: `${iot.lux}k`, label: 'Light', color: 'text-amber' },
           ].map((d) => (
             <div key={d.label} className="text-center">
               <d.Icon className="size-3.5 mx-auto mb-1 text-white/60" />
@@ -78,17 +108,28 @@ export function VaultDetailSheet() {
 
       <div className="flex gap-2.5">
         <button
-          onClick={() => { closeSheet(); setTimeout(() => openSheet('stake'), 200) }}
+          onClick={() => {
+            closeSheet()
+            setTimeout(() => openSheet('stake', sheetContext ?? undefined), 200)
+          }}
           className="flex-[2] py-3.5 rounded-[14px] bg-forest text-white font-sans text-[15px] font-semibold border-none cursor-pointer active:bg-moss transition-colors"
         >
-          Invest More
+          {vault.hasPosition ? 'Invest More' : 'Invest now'}
         </button>
-        <button
-          onClick={() => { closeSheet(); setTimeout(() => openSheet('sell'), 200) }}
-          className="flex-1 py-3.5 rounded-[14px] bg-surface text-forest font-sans text-[15px] font-semibold border-[1.5px] border-input cursor-pointer"
-        >
-          Sell
-        </button>
+        {vault.hasPosition && (
+          <button
+            onClick={() => {
+              closeSheet()
+              setTimeout(
+                () => openSheet('sell', { positionCode: vault.name }),
+                200
+              )
+            }}
+            className="flex-1 py-3.5 rounded-[14px] bg-surface text-forest font-sans text-[15px] font-semibold border-[1.5px] border-input cursor-pointer"
+          >
+            Sell
+          </button>
+        )}
       </div>
     </BottomSheet>
   )

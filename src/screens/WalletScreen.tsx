@@ -21,7 +21,7 @@ import { SettingsRow, SettingsGroup } from '@/components/shared/SettingsRow'
 import { staggerContainer, staggerItem } from '@/motion/variants'
 
 export function WalletScreen() {
-  const { openSheet, showToast, showResult } = useAppStore()
+  const { openSheet, showToast } = useAppStore()
   const { address, balances } = useWallet()
   const { user, signOut } = useUser()
   const claimables = useClaimables()
@@ -61,26 +61,13 @@ export function WalletScreen() {
 
             <div className="flex gap-2.5">
               <button
-                onClick={() =>
-                  showResult({
-                    kind: 'success',
-                    title: 'Deposit received',
-                    message: '$0 added to your account balance.',
-                  })
-                }
+                onClick={() => openSheet('cash', { cashMode: 'add' })}
                 className="flex-1 py-2.5 rounded-[14px] bg-white/10 text-white font-sans text-[13px] font-semibold border-none cursor-pointer"
               >
                 Add Cash
               </button>
               <button
-                onClick={() =>
-                  showResult({
-                    kind: 'error',
-                    title: 'Cash out unavailable',
-                    message: 'No bank account is connected yet. Add a payout destination in Pengaturan first.',
-                    primaryLabel: 'Got it',
-                  })
-                }
+                onClick={() => openSheet('cash', { cashMode: 'withdraw' })}
                 className="flex-1 py-2.5 rounded-[14px] bg-white/10 text-white font-sans text-[13px] font-semibold border-none cursor-pointer"
               >
                 Cash Out

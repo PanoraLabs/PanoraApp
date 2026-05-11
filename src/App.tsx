@@ -19,6 +19,7 @@ import { ClaimSheet } from '@/screens/sheets/ClaimSheet'
 import { VaultDetailSheet } from '@/screens/sheets/VaultDetailSheet'
 import { BuySheet } from '@/screens/sheets/BuySheet'
 import { SellSheet } from '@/screens/sheets/SellSheet'
+import { CashSheet } from '@/screens/sheets/CashSheet'
 
 const screens = {
   home: HomeScreen,
@@ -57,6 +58,7 @@ function MainApp() {
         <VaultDetailSheet />
         <BuySheet />
         <SellSheet />
+        <CashSheet />
       </div>
       <BottomNav />
     </>

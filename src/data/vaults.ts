@@ -31,42 +31,8 @@ export interface ExploreVault {
   full?: boolean
 }
 
-export const activeVaults: ActiveVault[] = [
-  {
-    crop: 'chili',
-    status: 'Growing',
-    type: 'Greenhouse · West Java',
-    name: 'Red Chili · Subang',
-    loc: 'Subang, West Java',
-    staked: '$0',
-    apy: '0%',
-    daysLeft: '0 days to harvest',
-    pct: 0,
-  },
-  {
-    crop: 'coffee',
-    status: 'Growing',
-    type: 'Coffee Export · Sulawesi',
-    name: 'Toraja Arabica',
-    loc: 'Toraja, South Sulawesi',
-    staked: '$0',
-    apy: '0%',
-    daysLeft: '0 days to harvest',
-    pct: 0,
-  },
-  {
-    crop: 'shallot',
-    status: 'Early stage',
-    type: 'Greenhouse · Central Java',
-    name: 'Shallot · Brebes',
-    loc: 'Brebes, Central Java',
-    staked: '$0',
-    apy: '0%',
-    daysLeft: '0 days to harvest',
-    pct: 0,
-    gold: true,
-  },
-]
+// Empty by default — populated by the demo store as the user invests.
+export const activeVaults: ActiveVault[] = []
 
 export const exploreVaults: ExploreVault[] = [
   {
@@ -76,10 +42,10 @@ export const exploreVaults: ExploreVault[] = [
     loc: 'Subang',
     status: 'Open',
     statusClass: 'bg-leaf/15 text-leaf',
-    target: '$0',
-    apy: '0%',
-    duration: '0 days',
-    funded: 0,
+    target: '$120k',
+    apy: '18%',
+    duration: '90 days',
+    funded: 62,
   },
   {
     crop: 'vanilla',
@@ -88,11 +54,10 @@ export const exploreVaults: ExploreVault[] = [
     loc: 'Temanggung',
     status: 'Closes in 48h',
     statusClass: 'bg-gold text-white',
-    target: '$0',
-    apy: '0%',
-    duration: '$0',
-    durationLabel: 'Min Stake',
-    funded: 0,
+    target: '$95k',
+    apy: '24%',
+    duration: '120 days',
+    funded: 81,
     highlight: true,
   },
   {
@@ -102,10 +67,10 @@ export const exploreVaults: ExploreVault[] = [
     loc: 'Toraja',
     status: 'Sold out',
     statusClass: 'bg-stone/12 text-stone',
-    target: '$0',
-    apy: '0%',
-    duration: '0 months',
-    funded: 0,
+    target: '$200k',
+    apy: '15%',
+    duration: '6 months',
+    funded: 100,
     full: true,
   },
   {
@@ -115,10 +80,22 @@ export const exploreVaults: ExploreVault[] = [
     loc: 'Karawang',
     status: 'Open',
     statusClass: 'bg-leaf/15 text-leaf',
-    target: '$0',
-    apy: '0%',
-    duration: '0 days',
-    funded: 0,
+    target: '$80k',
+    apy: '12%',
+    duration: '75 days',
+    funded: 34,
+  },
+  {
+    crop: 'shallot',
+    type: 'Greenhouse · Central Java',
+    name: 'Shallot · Brebes',
+    loc: 'Brebes',
+    status: 'Open',
+    statusClass: 'bg-leaf/15 text-leaf',
+    target: '$60k',
+    apy: '16%',
+    duration: '60 days',
+    funded: 22,
   },
 ]
 

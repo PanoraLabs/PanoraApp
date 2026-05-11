@@ -74,7 +74,9 @@ export function HomeScreen() {
           </div>
           <div className="inline-flex items-center gap-1.5 bg-sprout/15 border border-sprout/25 px-2.5 py-1 rounded-full">
             <TrendingUp className="size-3 text-sprout" />
-            <span className="text-sprout text-[12px] font-semibold">+{profile.gainPercent}%</span>
+            {profile.gainPercent > 0 && (
+              <span className="text-sprout text-[12px] font-semibold">+{profile.gainPercent}%</span>
+            )}
             <span className="text-white/55 text-[11px]">{profile.gainAmount}</span>
           </div>
         </div>
@@ -96,23 +98,25 @@ export function HomeScreen() {
       {/* Content */}
         <div className="px-[22px] pt-[18px]">
           {/* Claimable Banner */}
-          <motion.div
-            whileTap={{ scale: 0.98 }}
-            onClick={() => openSheet('claim')}
-            className="bg-gradient-to-br from-gold to-amber rounded-xl px-3 py-2.5 flex items-center gap-2.5 mb-[18px] cursor-pointer"
-          >
-            <div className="w-9 h-9 rounded-[10px] bg-white/20 flex items-center justify-center shrink-0">
-              <Coins className="size-4 text-white" strokeWidth={2.2} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[9px] font-semibold text-white/85 uppercase tracking-wider">Ready to claim</div>
-              <div className="font-serif text-base text-white leading-tight">
-                <AnimatedCounter value={profile.claimableValue} format={formatUsd} />
+          {profile.claimableValue > 0 && (
+            <motion.div
+              whileTap={{ scale: 0.98 }}
+              onClick={() => openSheet('claim')}
+              className="bg-gradient-to-br from-gold to-amber rounded-xl px-3 py-2.5 flex items-center gap-2.5 mb-[18px] cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-[10px] bg-white/20 flex items-center justify-center shrink-0">
+                <Coins className="size-4 text-white" strokeWidth={2.2} />
               </div>
-              <div className="text-[10px] text-white/70 leading-tight mt-px truncate">{profile.claimableSource}</div>
-            </div>
-            <ChevronRight className="size-4 text-white/70 shrink-0" />
-          </motion.div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[9px] font-semibold text-white/85 uppercase tracking-wider">Ready to claim</div>
+                <div className="font-serif text-base text-white leading-tight">
+                  <AnimatedCounter value={profile.claimableValue} format={formatUsd} />
+                </div>
+                <div className="text-[10px] text-white/70 leading-tight mt-px truncate">{profile.claimableSource}</div>
+              </div>
+              <ChevronRight className="size-4 text-white/70 shrink-0" />
+            </motion.div>
+          )}
 
           {/* Stats */}
           <motion.div
@@ -143,11 +147,37 @@ export function HomeScreen() {
           animate="animate"
           className="flex gap-3 overflow-x-auto hide-scrollbar mx-0 px-[22px] pb-1"
         >
-          {vaults.map((v) => (
-            <motion.div key={v.name} variants={staggerItem} className="shrink-0">
-              <VaultCard vault={v} onClick={() => openSheet('vault-detail')} />
-            </motion.div>
-          ))}
+          {vaults.length === 0 ? (
+            <button
+              onClick={() => setScreen('explore', 'explore')}
+              className="shrink-0 w-[210px] bg-card-bg border border-dashed border-leaf/40 rounded-[18px] p-4 text-left cursor-pointer active:bg-leaf/5 transition-colors"
+            >
+              <div className="text-[12px] font-semibold text-forest mb-1">Start your first vault</div>
+              <div className="text-[11px] text-stone leading-relaxed">
+                Add cash and pick a crop to begin earning.
+              </div>
+              <div className="text-[11px] text-leaf font-semibold mt-2">Browse vaults →</div>
+            </button>
+          ) : (
+            vaults.map((v) => (
+              <motion.div key={v.name} variants={staggerItem} className="shrink-0">
+                <VaultCard
+                  vault={v}
+                  onClick={() =>
+                    openSheet('vault-detail', {
+                      vaultCode: v.name,
+                      vaultSub: v.type,
+                      crop: v.crop,
+                      apyLabel: v.apy,
+                      daysLeftLabel: v.daysLeft,
+                      pct: v.pct,
+                      loc: v.loc,
+                    })
+                  }
+                />
+              </motion.div>
+            ))
+          )}
         </motion.div>
 
         <div className="px-[22px]">
@@ -184,13 +214,19 @@ export function HomeScreen() {
               See all →
             </button>
           </div>
-          <motion.div variants={staggerContainer} initial="initial" animate="animate">
-            {recent.map((a) => (
-              <motion.div key={a.sub} variants={staggerItem}>
-                <ActivityRow item={a} compactNeutral />
-              </motion.div>
-            ))}
-          </motion.div>
+          {recent.length === 0 ? (
+            <div className="text-[11px] text-stone text-center py-3">
+              No activity yet. Add cash to get started.
+            </div>
+          ) : (
+            <motion.div variants={staggerContainer} initial="initial" animate="animate">
+              {recent.map((a, i) => (
+                <motion.div key={`${a.sub}-${i}`} variants={staggerItem}>
+                  <ActivityRow item={a} compactNeutral />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
           <div className="h-2" />
         </div>
       </div>

@@ -3,10 +3,12 @@ import { motion } from 'framer-motion'
 import { Check, AlertCircle, TrendingUp } from 'lucide-react'
 import { TopNav } from '@/components/TopNav'
 import { useAppStore } from '@/store/app-store'
-import { usePortfolioAllocations, usePortfolioMilestones, usePositions } from '@/hooks/usePortfolio'
+import { usePortfolioAllocations, usePortfolioMilestones, usePortfolioSummary, usePositions } from '@/hooks/usePortfolio'
+import { useDemoStore } from '@/store/demo-store'
 import { PositionRow } from '@/components/shared/PositionRow'
 import { staggerContainer, staggerItem } from '@/motion/variants'
 import { cn } from '@/lib/utils'
+import { formatUsd, parseUsd } from '@/lib/format'
 import type { MilestoneState } from '@/data/positions'
 
 const MILESTONE_STATE: Record<MilestoneState, { className: string; render: (label: string) => React.ReactNode }> = {
@@ -26,9 +28,14 @@ const MILESTONE_STATE: Record<MilestoneState, { className: string; render: (labe
 
 export function PortfolioScreen() {
   const openSheet = useAppStore((s) => s.openSheet)
+  const setScreen = useAppStore((s) => s.setScreen)
   const positions = usePositions()
   const allocations = usePortfolioAllocations()
   const milestones = usePortfolioMilestones()
+  const { investedUsd, estProfitUsd } = usePortfolioSummary()
+  const claimables = useDemoStore((s) => s.claimables)
+  const earnedUsd = claimables.reduce((sum, c) => sum + parseUsd(c.amount), 0)
+  const totalValueUsd = investedUsd + estProfitUsd
   const [activeTab, setActiveTab] = useState<'active' | 'settled'>('active')
 
   return (
@@ -39,10 +46,12 @@ export function PortfolioScreen() {
           {/* Summary card */}
           <div className="bg-gradient-to-br from-forest to-[#153D28] rounded-[20px] p-5 mb-[18px] text-center">
             <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1.5">Total Value</div>
-            <div className="font-serif text-[38px] text-white tracking-tight mb-1">$0</div>
+            <div className="font-serif text-[38px] text-white tracking-tight mb-1">
+              {totalValueUsd > 0 ? formatUsd(totalValueUsd) : '$0'}
+            </div>
             <div className="text-[13px] text-sprout inline-flex items-center gap-1 justify-center">
               <TrendingUp className="size-3.5" />
-              Earned so far: $0
+              Earned so far: {formatUsd(earnedUsd)}
             </div>
             <div className="mt-4 flex items-center justify-center gap-5">
               <svg width="100" height="100" style={{ transform: 'rotate(-90deg)' }}>
@@ -83,13 +92,38 @@ export function PortfolioScreen() {
           </div>
 
           {/* Position items */}
-          <motion.div variants={staggerContainer} initial="initial" animate="animate">
-            {positions.map((p) => (
-              <motion.div key={p.code} variants={staggerItem}>
-                <PositionRow position={p} onClick={() => openSheet('vault-detail')} />
-              </motion.div>
-            ))}
-          </motion.div>
+          {positions.length === 0 ? (
+            <div className="bg-card-bg border border-border rounded-[14px] p-5 text-center mb-3">
+              <div className="text-[13px] font-semibold text-forest mb-1">No investments yet</div>
+              <div className="text-[11px] text-stone mb-3">
+                Add cash, then pick a vault from Discover to start earning.
+              </div>
+              <button
+                onClick={() => setScreen('explore', 'explore')}
+                className="text-[12px] font-semibold text-leaf border-none bg-transparent cursor-pointer"
+              >
+                Browse vaults →
+              </button>
+            </div>
+          ) : (
+            <motion.div variants={staggerContainer} initial="initial" animate="animate">
+              {positions.map((p) => (
+                <motion.div key={p.code} variants={staggerItem}>
+                  <PositionRow
+                    position={p}
+                    onClick={() =>
+                      openSheet('vault-detail', {
+                        vaultCode: p.code,
+                        vaultSub: p.sub,
+                        crop: p.crop,
+                        pct: p.pct,
+                      })
+                    }
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
 
           {/* Milestone Tracker */}
           <div className="flex items-center justify-between mb-3 mt-1.5">

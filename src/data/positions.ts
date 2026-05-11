@@ -11,46 +11,19 @@ export interface Position {
   gold?: boolean
 }
 
-export const positions: Position[] = [
-  {
-    crop: 'chili',
-    code: 'Red Chili · Subang',
-    sub: 'Greenhouse · West Java',
-    val: '$0',
-    profit: '+$0',
-    pct: 0,
-    profitColor: 'text-sprout',
-  },
-  {
-    crop: 'coffee',
-    code: 'Toraja Arabica',
-    sub: 'Coffee Export · Sulawesi',
-    val: '$0',
-    profit: '+$0',
-    pct: 0,
-    profitColor: 'text-sprout',
-  },
-  {
-    crop: 'shallot',
-    code: 'Shallot · Brebes',
-    sub: 'Greenhouse · Central Java',
-    val: '$0',
-    profit: '0 days to go',
-    pct: 0,
-    profitColor: 'text-gold',
-    gold: true,
-  },
-]
+// Empty by default — populated by the demo store as the user invests.
+export const positions: Position[] = []
 
 export interface PortfolioAllocation {
   color: string
   label: string
 }
 
+// Fallback shown only when the user has no investments yet.
 export const portfolioAllocations: PortfolioAllocation[] = [
-  { color: '#5DBB7A', label: 'Greenhouse 0%' },
-  { color: '#C8961E', label: 'Coffee & Spice 0%' },
-  { color: 'rgba(255,255,255,0.3)', label: 'Grains 0%' },
+  { color: '#5DBB7A', label: 'Greenhouse —' },
+  { color: '#C8961E', label: 'Coffee & Spice —' },
+  { color: 'rgba(255,255,255,0.3)', label: 'Grains —' },
 ]
 
 export type MilestoneState = 'done' | 'pending' | 'upcoming'
