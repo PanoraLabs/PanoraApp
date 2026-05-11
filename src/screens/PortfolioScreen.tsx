@@ -39,16 +39,16 @@ export function PortfolioScreen() {
           {/* Summary card */}
           <div className="bg-gradient-to-br from-forest to-[#153D28] rounded-[20px] p-5 mb-[18px] text-center">
             <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1.5">Total Value</div>
-            <div className="font-serif text-[38px] text-white tracking-tight mb-1">Rp 48,200,000</div>
+            <div className="font-serif text-[38px] text-white tracking-tight mb-1">$0</div>
             <div className="text-[13px] text-sprout inline-flex items-center gap-1 justify-center">
               <TrendingUp className="size-3.5" />
-              Earned so far: Rp 12.4M
+              Earned so far: $0
             </div>
             <div className="mt-4 flex items-center justify-center gap-5">
               <svg width="100" height="100" style={{ transform: 'rotate(-90deg)' }}>
                 <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="16" />
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#5DBB7A" strokeWidth="16" strokeDasharray="238.6" strokeDashoffset="107.4" />
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#C8961E" strokeWidth="16" strokeDasharray="238.6" strokeDashoffset="155.1" transform="rotate(162 50 50)" />
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#5DBB7A" strokeWidth="16" strokeDasharray="238.6" strokeDashoffset="238.6" />
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#C8961E" strokeWidth="16" strokeDasharray="238.6" strokeDashoffset="238.6" transform="rotate(162 50 50)" />
               </svg>
               <div className="flex flex-col gap-1.5">
                 {allocations.map((l) => (

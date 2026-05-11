@@ -2,7 +2,7 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
 import { useDemoStore } from '@/store/demo-store'
-import { formatRupiah } from '@/lib/format'
+import { formatUsd } from '@/lib/format'
 
 export function BuySheet() {
   const closeSheet = useAppStore((s) => s.closeSheet)
@@ -10,7 +10,7 @@ export function BuySheet() {
   const sheetContext = useAppStore((s) => s.sheetContext)
   const listings = useDemoStore((s) => s.listings)
   const buy = useDemoStore((s) => s.buy)
-  const cashIdr = useDemoStore((s) => s.cashIdr)
+  const cashUsd = useDemoStore((s) => s.cashUsd)
 
   const target =
     listings.find((l) => l.code === sheetContext?.listingCode) ?? listings[0] ?? null
@@ -60,15 +60,15 @@ export function BuySheet() {
         </div>
         <div className="flex justify-between text-[13px] py-1.5 border-b border-border">
           <span className="text-stone">Platform fee (1%)</span>
-          <span className="text-stone">{formatRupiah(fee)}</span>
+          <span className="text-stone">{formatUsd(fee)}</span>
         </div>
         <div className="flex justify-between text-sm py-1.5">
           <span className="font-semibold">Total cost</span>
-          <span className="font-semibold text-forest">{formatRupiah(total)}</span>
+          <span className="font-semibold text-forest">{formatUsd(total)}</span>
         </div>
         <div className="flex justify-between text-[11px] py-1">
           <span className="text-stone">Your cash</span>
-          <span className="text-stone">{formatRupiah(cashIdr)}</span>
+          <span className="text-stone">{formatUsd(cashUsd)}</span>
         </div>
       </div>
 

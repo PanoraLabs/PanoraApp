@@ -65,7 +65,7 @@ export function WalletScreen() {
                   showResult({
                     kind: 'success',
                     title: 'Deposit received',
-                    message: 'Rp 1,000,000 added to your account balance.',
+                    message: '$0 added to your account balance.',
                   })
                 }
                 className="flex-1 py-2.5 rounded-[14px] bg-white/10 text-white font-sans text-[13px] font-semibold border-none cursor-pointer"
@@ -130,8 +130,8 @@ export function WalletScreen() {
               <SettingsRow
                 Icon={CurrencyIcon}
                 label="Currency"
-                hint="Indonesian Rupiah"
-                trailing="IDR"
+                hint="US Dollar"
+                trailing="USD"
                 onClick={() => showToast('Currency settings')}
               />
               <SettingsRow

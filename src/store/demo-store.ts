@@ -15,13 +15,14 @@ import {
   type ActivityGroup,
   type ActivityItem,
 } from '@/data/activity'
-import { formatRupiah, formatRupiahCompact, formatShortDate, formatMonthYear } from '@/lib/format'
+import { formatUsd, formatUsdCompact, formatShortDate, formatMonthYear } from '@/lib/format'
 
-const SEED_CASH_IDR = 50_000_000
-const SEED_FEES_SOL = 4.21
+const SEED_CASH_USD = 0
+const SEED_FEES_SOL = 0
+const MIN_STAKE_USD = 1
 
 type DemoEntities = {
-  cashIdr: number
+  cashUsd: number
   feesSol: number
   activeVaults: ActiveVault[]
   positions: Position[]
@@ -36,7 +37,7 @@ type StakeInput = {
   vaultCode: string
   vaultSub: string
   crop: Position['crop']
-  amountIdr: number
+  amountUsd: number
   apyLabel: string
   daysLeftLabel: string
   pct: number
@@ -44,20 +45,20 @@ type StakeInput = {
   status?: ActiveVault['status']
 }
 
-type ClaimResult = { amountIdr: number; code: string }
-type SellInput = { positionCode: string; askPriceIdr: number }
+type ClaimResult = { amountUsd: number; code: string }
+type SellInput = { positionCode: string; askPriceUsd: number }
 
 interface DemoState extends DemoEntities {
   stake: (input: StakeInput) => { ok: true } | { ok: false; reason: string }
   claim: (claimableCode: string) => { ok: true; result: ClaimResult } | { ok: false; reason: string }
-  buy: (listingCode: string) => { ok: true; totalCostIdr: number } | { ok: false; reason: string }
+  buy: (listingCode: string) => { ok: true; totalCostUsd: number } | { ok: false; reason: string }
   sell: (input: SellInput) => { ok: true } | { ok: false; reason: string }
   reset: () => void
 }
 
 function seed(): DemoEntities {
   return {
-    cashIdr: SEED_CASH_IDR,
+    cashUsd: SEED_CASH_USD,
     feesSol: SEED_FEES_SOL,
     activeVaults: structuredClone(seedActiveVaults),
     positions: structuredClone(seedPositions),
@@ -69,9 +70,9 @@ function seed(): DemoEntities {
   }
 }
 
-function parseRupiah(s: string): number {
-  // "Rp 10M" / "Rp 1.8M" / "Rp 10,000,000" → number
-  const trimmed = s.replace(/^Rp\s*/i, '').replace(/[+−-]/g, '').trim()
+function parseUsd(s: string): number {
+  // "$10M" / "$1.8M" / "$10,000,000" → number
+  const trimmed = s.replace(/^\$\s*/, '').replace(/[+−-]/g, '').trim()
   if (/M$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000_000)
   if (/K$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000)
   if (/B$/i.test(trimmed)) return Math.round(parseFloat(trimmed) * 1_000_000_000)
@@ -98,13 +99,13 @@ export const useDemoStore = create<DemoState>()(
 
       stake: (input) => {
         const state = get()
-        if (input.amountIdr < 500_000) {
-          return { ok: false, reason: 'Minimum investment is Rp 500,000.' }
+        if (input.amountUsd < MIN_STAKE_USD) {
+          return { ok: false, reason: `Minimum investment is ${formatUsd(MIN_STAKE_USD)}.` }
         }
-        if (input.amountIdr > state.cashIdr) {
+        if (input.amountUsd > state.cashUsd) {
           return {
             ok: false,
-            reason: `Insufficient cash. Available ${formatRupiah(state.cashIdr)}, you tried ${formatRupiah(input.amountIdr)}.`,
+            reason: `Insufficient cash. Available ${formatUsd(state.cashUsd)}, you tried ${formatUsd(input.amountUsd)}.`,
           }
         }
 
@@ -112,14 +113,14 @@ export const useDemoStore = create<DemoState>()(
         const existingPos = positions.findIndex((p) => p.code === input.vaultCode)
         if (existingPos >= 0) {
           const prev = positions[existingPos]
-          const prevVal = parseRupiah(prev.val)
-          positions[existingPos] = { ...prev, val: formatRupiahCompact(prevVal + input.amountIdr) }
+          const prevVal = parseUsd(prev.val)
+          positions[existingPos] = { ...prev, val: formatUsdCompact(prevVal + input.amountUsd) }
         } else {
           positions.push({
             crop: input.crop,
             code: input.vaultCode,
             sub: input.vaultSub,
-            val: formatRupiahCompact(input.amountIdr),
+            val: formatUsdCompact(input.amountUsd),
             profit: input.daysLeftLabel,
             pct: input.pct,
             profitColor: 'text-gold',
@@ -131,8 +132,8 @@ export const useDemoStore = create<DemoState>()(
         const existingVault = activeVaults.findIndex((v) => v.name === input.vaultCode)
         if (existingVault >= 0) {
           const prev = activeVaults[existingVault]
-          const prevStaked = parseRupiah(prev.staked)
-          activeVaults[existingVault] = { ...prev, staked: formatRupiahCompact(prevStaked + input.amountIdr) }
+          const prevStaked = parseUsd(prev.staked)
+          activeVaults[existingVault] = { ...prev, staked: formatUsdCompact(prevStaked + input.amountUsd) }
         } else {
           activeVaults.push({
             crop: input.crop,
@@ -140,7 +141,7 @@ export const useDemoStore = create<DemoState>()(
             type: input.vaultSub,
             name: input.vaultCode,
             loc: input.loc,
-            staked: formatRupiahCompact(input.amountIdr),
+            staked: formatUsdCompact(input.amountUsd),
             apy: input.apyLabel,
             daysLeft: input.daysLeftLabel,
             pct: input.pct,
@@ -151,16 +152,16 @@ export const useDemoStore = create<DemoState>()(
         const existingToken = tokens.findIndex((t) => t.code === input.vaultCode)
         if (existingToken >= 0) {
           const prev = tokens[existingToken]
-          const prevPrincipal = parseRupiah(prev.principal)
+          const prevPrincipal = parseUsd(prev.principal)
           tokens[existingToken] = {
             ...prev,
-            principal: `${formatRupiahCompact(prevPrincipal + input.amountIdr)} invested`,
+            principal: `${formatUsdCompact(prevPrincipal + input.amountUsd)} invested`,
           }
         } else {
           tokens.push({
             crop: input.crop,
             code: input.vaultCode,
-            principal: `${formatRupiahCompact(input.amountIdr)} invested`,
+            principal: `${formatUsdCompact(input.amountUsd)} invested`,
           })
         }
 
@@ -168,13 +169,13 @@ export const useDemoStore = create<DemoState>()(
           action: 'invest',
           name: 'New investment',
           sub: input.vaultCode,
-          amt: `−${formatRupiahCompact(input.amountIdr)}`,
+          amt: `−${formatUsdCompact(input.amountUsd)}`,
           pos: false,
           date: formatShortDate(),
         }
 
         set({
-          cashIdr: state.cashIdr - input.amountIdr,
+          cashUsd: state.cashUsd - input.amountUsd,
           positions,
           activeVaults,
           participationTokens: tokens,
@@ -187,37 +188,37 @@ export const useDemoStore = create<DemoState>()(
         const state = get()
         const target = state.claimables.find((c) => c.code === claimableCode)
         if (!target) return { ok: false, reason: 'No matching claimable found.' }
-        const amountIdr = parseRupiah(target.amount)
+        const amountUsd = parseUsd(target.amount)
 
         const claimables = state.claimables.filter((c) => c.code !== claimableCode)
         const activityItem: ActivityItem = {
           action: 'profit',
           name: 'Profit claimed',
           sub: `${target.code} · settled`,
-          amt: `+${formatRupiahCompact(amountIdr)}`,
+          amt: `+${formatUsdCompact(amountUsd)}`,
           pos: true,
           date: formatShortDate(),
         }
 
         set({
-          cashIdr: state.cashIdr + amountIdr,
+          cashUsd: state.cashUsd + amountUsd,
           claimables,
           ...logActivity(state, activityItem),
         })
-        return { ok: true, result: { amountIdr, code: target.code } }
+        return { ok: true, result: { amountUsd, code: target.code } }
       },
 
       buy: (listingCode) => {
         const state = get()
         const listing = state.listings.find((l) => l.code === listingCode)
         if (!listing) return { ok: false, reason: 'Listing not found.' }
-        const price = parseRupiah(listing.price)
+        const price = parseUsd(listing.price)
         const fee = Math.round(price * 0.01)
         const total = price + fee
-        if (total > state.cashIdr) {
+        if (total > state.cashUsd) {
           return {
             ok: false,
-            reason: `Insufficient cash. Need ${formatRupiah(total)}, have ${formatRupiah(state.cashIdr)}.`,
+            reason: `Insufficient cash. Need ${formatUsd(total)}, have ${formatUsd(state.cashUsd)}.`,
           }
         }
 
@@ -225,14 +226,14 @@ export const useDemoStore = create<DemoState>()(
         const existing = positions.findIndex((p) => p.code === listing.code)
         if (existing >= 0) {
           const prev = positions[existing]
-          const prevVal = parseRupiah(prev.val)
-          positions[existing] = { ...prev, val: formatRupiahCompact(prevVal + price) }
+          const prevVal = parseUsd(prev.val)
+          positions[existing] = { ...prev, val: formatUsdCompact(prevVal + price) }
         } else {
           positions.push({
             crop: listing.crop,
             code: listing.code,
             sub: listing.day,
-            val: formatRupiahCompact(price),
+            val: formatUsdCompact(price),
             profit: listing.chg,
             pct: 50,
             profitColor: listing.up ? 'text-sprout' : 'text-stone',
@@ -243,16 +244,16 @@ export const useDemoStore = create<DemoState>()(
         const tokenIdx = tokens.findIndex((t) => t.code === listing.code)
         if (tokenIdx >= 0) {
           const prev = tokens[tokenIdx]
-          const prevPrincipal = parseRupiah(prev.principal)
+          const prevPrincipal = parseUsd(prev.principal)
           tokens[tokenIdx] = {
             ...prev,
-            principal: `${formatRupiahCompact(prevPrincipal + price)} invested`,
+            principal: `${formatUsdCompact(prevPrincipal + price)} invested`,
           }
         } else {
           tokens.push({
             crop: listing.crop,
             code: listing.code,
-            principal: `${formatRupiahCompact(price)} invested`,
+            principal: `${formatUsdCompact(price)} invested`,
           })
         }
 
@@ -262,39 +263,39 @@ export const useDemoStore = create<DemoState>()(
           action: 'invest',
           name: 'Bought share',
           sub: listing.code,
-          amt: `−${formatRupiahCompact(total)}`,
+          amt: `−${formatUsdCompact(total)}`,
           pos: false,
           date: formatShortDate(),
         }
 
         set({
-          cashIdr: state.cashIdr - total,
+          cashUsd: state.cashUsd - total,
           positions,
           participationTokens: tokens,
           listings,
           ...logActivity(state, activityItem),
         })
-        return { ok: true, totalCostIdr: total }
+        return { ok: true, totalCostUsd: total }
       },
 
       sell: (input) => {
         const state = get()
         const position = state.positions.find((p) => p.code === input.positionCode)
         if (!position) return { ok: false, reason: 'Position not found.' }
-        const investedIdr = parseRupiah(position.val)
-        if (input.askPriceIdr < investedIdr) {
+        const investedUsd = parseUsd(position.val)
+        if (input.askPriceUsd < investedUsd) {
           return {
             ok: false,
-            reason: `Asking price ${formatRupiah(input.askPriceIdr)} is below your original investment of ${formatRupiah(investedIdr)}.`,
+            reason: `Asking price ${formatUsd(input.askPriceUsd)} is below your original investment of ${formatUsd(investedUsd)}.`,
           }
         }
 
-        const chgPct = ((input.askPriceIdr - investedIdr) / investedIdr) * 100
+        const chgPct = investedUsd > 0 ? ((input.askPriceUsd - investedUsd) / investedUsd) * 100 : 0
         const listing: MarketListing = {
           crop: position.crop,
           code: position.code,
           day: position.sub,
-          price: formatRupiah(input.askPriceIdr),
+          price: formatUsd(input.askPriceUsd),
           chg: `${chgPct >= 0 ? '+' : '−'}${Math.abs(chgPct).toFixed(1)}% vs entry`,
           up: chgPct >= 0,
         }
@@ -310,7 +311,7 @@ export const useDemoStore = create<DemoState>()(
         const activityItem: ActivityItem = {
           action: 'milestone',
           name: 'Listed for sale',
-          sub: `${position.code} · ${formatRupiahCompact(input.askPriceIdr)}`,
+          sub: `${position.code} · ${formatUsdCompact(input.askPriceUsd)}`,
           amt: 'On marketplace',
           neutral: true,
           date: formatShortDate(),
@@ -326,11 +327,11 @@ export const useDemoStore = create<DemoState>()(
       reset: () => set(seed()),
     }),
     {
-      name: 'panora-demo-v1',
-      version: 1,
+      name: 'panora-demo-v2',
+      version: 2,
       // Only persist the entity state, not actions
       partialize: (s): DemoEntities => ({
-        cashIdr: s.cashIdr,
+        cashUsd: s.cashUsd,
         feesSol: s.feesSol,
         activeVaults: s.activeVaults,
         positions: s.positions,

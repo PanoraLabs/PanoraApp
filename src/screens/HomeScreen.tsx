@@ -22,7 +22,7 @@ import { IoTCard } from '@/components/shared/IoTCard'
 import { ActivityRow } from '@/components/shared/ActivityRow'
 import { AnimatedCounter } from '@/components/shared/AnimatedCounter'
 import { staggerContainer, staggerItem } from '@/motion/variants'
-import { formatRupiah } from '@/lib/format'
+import { formatUsd } from '@/lib/format'
 
 interface ActionPill {
   Icon: LucideIcon
@@ -70,7 +70,7 @@ export function HomeScreen() {
         <div className="relative z-[1] mb-4">
           <div className="text-[11px] text-white/40 uppercase tracking-widest mb-1">Total Value</div>
           <div className="font-serif text-4xl text-white tracking-tight leading-none mb-2">
-            <AnimatedCounter value={profile.totalPortfolioValue} format={formatRupiah} />
+            <AnimatedCounter value={profile.totalPortfolioValue} format={formatUsd} />
           </div>
           <div className="inline-flex items-center gap-1.5 bg-sprout/15 border border-sprout/25 px-2.5 py-1 rounded-full">
             <TrendingUp className="size-3 text-sprout" />
@@ -107,7 +107,7 @@ export function HomeScreen() {
             <div className="flex-1 min-w-0">
               <div className="text-[9px] font-semibold text-white/85 uppercase tracking-wider">Ready to claim</div>
               <div className="font-serif text-base text-white leading-tight">
-                <AnimatedCounter value={profile.claimableValue} format={formatRupiah} />
+                <AnimatedCounter value={profile.claimableValue} format={formatUsd} />
               </div>
               <div className="text-[10px] text-white/70 leading-tight mt-px truncate">{profile.claimableSource}</div>
             </div>

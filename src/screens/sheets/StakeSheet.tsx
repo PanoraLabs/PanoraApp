@@ -4,15 +4,15 @@ import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
 import { useDemoStore } from '@/store/demo-store'
 import { CropIcon, type CropKey } from '@/lib/icons'
-import { formatRupiah, formatRupiahCompact } from '@/lib/format'
+import { formatUsd, formatUsdCompact } from '@/lib/format'
 
 const DEFAULT_TARGET = {
   vaultCode: 'Red Chili · Subang',
-  vaultSub: 'Greenhouse · West Java · Est. 18% · 90 days',
+  vaultSub: 'Greenhouse · West Java · Est. 0% · 0 days',
   crop: 'chili' as CropKey,
-  apyLabel: '18%',
-  daysLeftLabel: '90 days to harvest',
-  pct: 5,
+  apyLabel: '0%',
+  daysLeftLabel: '0 days to harvest',
+  pct: 0,
   loc: 'Subang, West Java',
 }
 
@@ -21,8 +21,8 @@ export function StakeSheet() {
   const showResult = useAppStore((s) => s.showResult)
   const sheetContext = useAppStore((s) => s.sheetContext)
   const stake = useDemoStore((s) => s.stake)
-  const cashIdr = useDemoStore((s) => s.cashIdr)
-  const [amount, setAmount] = useState(5_000_000)
+  const cashUsd = useDemoStore((s) => s.cashUsd)
+  const [amount, setAmount] = useState(0)
 
   const target = useMemo(() => {
     if (!sheetContext?.vaultCode) return DEFAULT_TARGET
@@ -37,11 +37,11 @@ export function StakeSheet() {
     }
   }, [sheetContext])
 
-  const apyPct = parseFloat(target.apyLabel) || 18
+  const apyPct = parseFloat(target.apyLabel) || 0
   const profit = Math.round(amount * (apyPct / 100))
   const total = amount + profit
 
-  const fmt = useCallback((v: number) => formatRupiah(v), [])
+  const fmt = useCallback((v: number) => formatUsd(v), [])
 
   return (
     <BottomSheet id="stake">
@@ -58,10 +58,10 @@ export function StakeSheet() {
       <div className="mb-3.5">
         <div className="flex items-center justify-between mb-1.5">
           <label className="text-[11px] font-semibold text-stone uppercase tracking-wider">Amount</label>
-          <span className="text-[10px] text-stone">Available: {formatRupiahCompact(cashIdr)}</span>
+          <span className="text-[10px] text-stone">Available: {formatUsdCompact(cashUsd)}</span>
         </div>
         <div className="relative">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-stone">Rp</span>
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-stone">$</span>
           <input
             className="w-full py-3 pl-11 pr-3.5 bg-surface border-[1.5px] border-input rounded-xl font-sans text-sm text-forest outline-none focus:border-leaf transition-colors"
             type="number"
@@ -73,16 +73,16 @@ export function StakeSheet() {
 
       <input
         type="range"
-        min={500_000}
-        max={25_000_000}
-        step={500_000}
+        min={1}
+        max={1_000_000}
+        step={1}
         value={amount}
         onChange={(e) => setAmount(parseInt(e.target.value))}
         className="w-full accent-leaf mb-1"
       />
       <div className="flex justify-between text-[10px] text-stone mb-4">
-        <span>Min Rp 500K</span>
-        <span>Max Rp 25M</span>
+        <span>Min $1</span>
+        <span>Max $1M</span>
       </div>
 
       <div className="bg-mist rounded-[14px] p-3.5 mb-4">
@@ -112,7 +112,7 @@ export function StakeSheet() {
             vaultCode: target.vaultCode,
             vaultSub: target.vaultSub,
             crop: target.crop,
-            amountIdr: amount,
+            amountUsd: amount,
             apyLabel: target.apyLabel,
             daysLeftLabel: target.daysLeftLabel,
             pct: target.pct,

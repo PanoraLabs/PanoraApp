@@ -22,9 +22,9 @@ export function VaultDetailSheet() {
 
       <div className="grid grid-cols-3 gap-2 mb-4">
         {[
-          { label: 'You invested', val: 'Rp 10M' },
-          { label: 'Est. return', val: '18%', color: 'text-sprout' },
-          { label: 'Days left', val: '25' },
+          { label: 'You invested', val: '$0' },
+          { label: 'Est. return', val: '0%', color: 'text-sprout' },
+          { label: 'Days left', val: '0' },
         ].map((m) => (
           <div key={m.label} className="bg-surface rounded-lg p-2">
             <div className="text-[9px] text-stone uppercase tracking-wider mb-0.5">{m.label}</div>
@@ -36,10 +36,10 @@ export function VaultDetailSheet() {
       <div className="mb-4">
         <div className="flex justify-between text-[10px] text-stone mb-1">
           <span>Progress</span>
-          <span className="font-serif text-forest">72%</span>
+          <span className="font-serif text-forest">0%</span>
         </div>
         <div className="h-1.5 bg-surface rounded-full overflow-hidden">
-          <div className="h-full rounded-full bg-gradient-to-r from-leaf to-sprout" style={{ width: '72%' }} />
+          <div className="h-full rounded-full bg-gradient-to-r from-leaf to-sprout" style={{ width: '0%' }} />
         </div>
       </div>
 
@@ -62,10 +62,10 @@ export function VaultDetailSheet() {
         </div>
         <div className="grid grid-cols-4 gap-2">
           {[
-            { Icon: Thermometer, val: '28°C', label: 'Temp' },
-            { Icon: Droplets, val: '82%', label: 'Humidity' },
-            { Icon: Sprout, val: '6.4', label: 'Soil pH' },
-            { Icon: Sun, val: '18k', label: 'Light', color: 'text-amber' },
+            { Icon: Thermometer, val: '0°C', label: 'Temp' },
+            { Icon: Droplets, val: '0%', label: 'Humidity' },
+            { Icon: Sprout, val: '0', label: 'Soil pH' },
+            { Icon: Sun, val: '0k', label: 'Light', color: 'text-amber' },
           ].map((d) => (
             <div key={d.label} className="text-center">
               <d.Icon className="size-3.5 mx-auto mb-1 text-white/60" />

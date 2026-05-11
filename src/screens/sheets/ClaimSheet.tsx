@@ -1,7 +1,7 @@
 import { BottomSheet } from '@/components/BottomSheet'
 import { useAppStore } from '@/store/app-store'
 import { useDemoStore } from '@/store/demo-store'
-import { formatRupiah } from '@/lib/format'
+import { formatUsd } from '@/lib/format'
 
 export function ClaimSheet() {
   const closeSheet = useAppStore((s) => s.closeSheet)
@@ -55,8 +55,8 @@ export function ClaimSheet() {
       <div className="mb-3.5">
         <label className="text-[11px] font-semibold text-stone uppercase tracking-wider mb-1.5 block">Send to</label>
         <select className="w-full py-3 px-3.5 bg-surface border-[1.5px] border-input rounded-xl font-sans text-sm text-forest outline-none appearance-none">
-          <option>Account balance (IDR)</option>
-          <option>BCA bank account (IDR)</option>
+          <option>Account balance (USD)</option>
+          <option>BCA bank account (USD)</option>
         </select>
       </div>
 
@@ -71,7 +71,7 @@ export function ClaimSheet() {
           showResult({
             kind: 'success',
             title: 'Profit claimed',
-            message: `${formatRupiah(result.result.amountIdr)} transferred to your account balance.`,
+            message: `${formatUsd(result.result.amountUsd)} transferred to your account balance.`,
             primaryLabel: 'Great',
           })
         }}

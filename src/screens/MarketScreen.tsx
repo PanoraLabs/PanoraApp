@@ -27,7 +27,7 @@ export function MarketScreen() {
             </div>
             <div className="text-right">
               <div className="text-[10px] text-white/40 mb-0.5">Today's volume</div>
-              <div className="font-serif text-base text-sprout">Rp 142M</div>
+              <div className="font-serif text-base text-sprout">$0</div>
             </div>
           </div>
 

@@ -15,21 +15,21 @@ export interface Claimable {
 export const walletAddress = '5xKj...PqRst'
 
 export const walletBalances = {
-  cash: '$2,840',
+  cash: '$0',
   cashLabel: 'USDC',
-  fees: '4.21 SOL',
+  fees: '0 SOL',
 }
 
 export const claimables: Claimable[] = [
   {
     code: 'Cacao Flores · 2025',
     settledOn: 'Settled Apr 10, 2026',
-    amount: 'Rp 1,820,000',
+    amount: '$0',
   },
 ]
 
 export const participationTokens: ParticipationToken[] = [
-  { crop: 'chili', code: 'Red Chili · Subang', principal: 'Rp 10M invested' },
-  { crop: 'coffee', code: 'Toraja Arabica', principal: 'Rp 25M invested' },
-  { crop: 'shallot', code: 'Shallot · Brebes', principal: 'Rp 8M invested' },
+  { crop: 'chili', code: 'Red Chili · Subang', principal: '$0 invested' },
+  { crop: 'coffee', code: 'Toraja Arabica', principal: '$0 invested' },
+  { crop: 'shallot', code: 'Shallot · Brebes', principal: '$0 invested' },
 ]
