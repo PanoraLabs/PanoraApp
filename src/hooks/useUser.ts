@@ -12,6 +12,7 @@ import {
   type ProfileRow,
 } from '@/lib/supabase'
 import { useAppStore, type StoredUser } from '@/store/app-store'
+import { setApiTokenGetter } from '@/lib/api'
 
 // Module-level guards so the fetch and wallet creation each happen once per
 // Privy id across the whole app, regardless of how many components mount
@@ -71,14 +72,17 @@ export function useUser(): UseUserReturn {
   }, [wallets, privyUser?.linkedAccounts])
 
   // Wire Privy's JWT getter to Supabase (no-op for now — see lib/supabase.ts)
+  // and to the core-services API client (used for /app/* bearer auth).
   useEffect(() => {
-    setSupabaseTokenGetter(async () => {
+    const tokenGetter = async () => {
       try {
         return (await getAccessToken()) ?? null
       } catch {
         return null
       }
-    })
+    }
+    setSupabaseTokenGetter(tokenGetter)
+    setApiTokenGetter(tokenGetter)
   }, [getAccessToken])
 
   // Auto-create a Solana embedded wallet if Privy didn't on login. Guarded at
