@@ -117,3 +117,54 @@ export function addCash(amountUsd: number): Promise<{ ok: boolean }> {
 export function withdraw(amountUsd: number): Promise<{ ok: boolean }> {
   return post('/app/wallet/withdraw', { amountUsd })
 }
+
+export interface ApiMarketListing {
+  crop: string
+  code: string
+  day: string
+  price: string
+  chg: string
+  up: boolean
+  owned?: boolean
+}
+export interface ApiActivityItem {
+  action: string
+  name: string
+  sub: string
+  amt: string
+  pos?: boolean
+  neutral?: boolean
+  date: string
+}
+export interface ApiPassportNFT {
+  bg: string
+  id: string
+  name: string
+  meta: { label: string; value: string }[]
+}
+
+export function getMarketListings(): Promise<ApiMarketListing[]> {
+  return req<ApiMarketListing[]>('/app/market/listings')
+}
+export function getActivity(): Promise<ApiActivityItem[]> {
+  return req<ApiActivityItem[]>('/app/activity')
+}
+export function getPassport(): Promise<ApiPassportNFT[]> {
+  return req<ApiPassportNFT[]>('/app/passport')
+}
+export function buy(listingCode: string): Promise<{ ok: boolean; totalCostUsd?: number }> {
+  return post('/app/market/buy', { listingCode })
+}
+export function sell(positionCode: string, askPriceUsd: number): Promise<{ ok: boolean }> {
+  return post('/app/market/sell', { positionCode, askPriceUsd })
+}
+export async function cancelListing(code: string): Promise<{ ok: boolean }> {
+  const p = `/app/market/listings/${encodeURIComponent(code)}`
+  const token = await getToken()
+  const res = await fetch(`${API_URL}${p}`, {
+    method: 'DELETE',
+    headers: token ? { authorization: `Bearer ${token}` } : {},
+  })
+  if (!res.ok) throw new Error(`DELETE ${p} → ${res.status}`)
+  return res.json() as Promise<{ ok: boolean }>
+}

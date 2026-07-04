@@ -20,14 +20,8 @@ export const walletBalances = {
   fees: '0 SOL',
 }
 
-// One pre-settled claimable so the user can demo the claim flow without waiting.
-export const claimables: Claimable[] = [
-  {
-    code: 'Cacao Flores · 2025',
-    settledOn: 'Settled Apr 10, 2026',
-    amount: '$500',
-  },
-]
+// Claimables come from core-services now (derived from completed positions).
+export const claimables: Claimable[] = []
 
 // Empty by default — populated when the user invests.
 export const participationTokens: ParticipationToken[] = []

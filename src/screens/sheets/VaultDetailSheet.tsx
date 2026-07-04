@@ -7,7 +7,6 @@ import { useIoTFeed } from '@/hooks/useHome'
 import { CropIcon, type CropKey } from '@/lib/icons'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { formatUsd, parseUsd } from '@/lib/format'
-import { exploreVaults } from '@/data/vaults'
 
 export function VaultDetailSheet() {
   const { closeSheet, openSheet, sheetContext } = useAppStore()
@@ -19,16 +18,15 @@ export function VaultDetailSheet() {
     const code = sheetContext?.vaultCode
     const active = activeVaults.find((v) => v.name === code)
     const position = positions.find((p) => p.code === code)
-    const explore = exploreVaults.find((v) => v.name === code)
 
-    const crop: CropKey = (sheetContext?.crop as CropKey) ?? active?.crop ?? position?.crop ?? explore?.crop ?? 'chili'
-    const name = code ?? explore?.name ?? 'Vault detail'
-    const sub = sheetContext?.vaultSub ?? active?.type ?? explore?.type ?? '—'
-    const apyLabel = sheetContext?.apyLabel ?? active?.apy ?? explore?.apy ?? '—'
-    const daysLeftLabel = sheetContext?.daysLeftLabel ?? active?.daysLeft ?? explore?.duration ?? '—'
+    const crop: CropKey = (sheetContext?.crop as CropKey) ?? active?.crop ?? position?.crop ?? 'chili'
+    const name = code ?? 'Vault detail'
+    const sub = sheetContext?.vaultSub ?? active?.type ?? '—'
+    const apyLabel = sheetContext?.apyLabel ?? active?.apy ?? '—'
+    const daysLeftLabel = sheetContext?.daysLeftLabel ?? active?.daysLeft ?? '—'
     const investedUsd = position ? parseUsd(position.val) : 0
-    const pct = sheetContext?.pct ?? active?.pct ?? explore?.funded ?? 0
-    const status = active?.status ?? (explore?.status === 'Sold out' ? 'Sold out' : 'Open')
+    const pct = sheetContext?.pct ?? active?.pct ?? 0
+    const status = active?.status ?? 'Open'
     const hasPosition = !!position
 
     return { crop, name, sub, apyLabel, daysLeftLabel, investedUsd, pct, status, hasPosition }

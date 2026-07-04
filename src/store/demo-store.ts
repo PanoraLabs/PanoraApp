@@ -1,32 +1,28 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { activeVaults as seedActiveVaults, type ActiveVault } from '@/data/vaults'
-import { positions as seedPositions, type Position } from '@/data/positions'
-import {
-  claimables as seedClaimables,
-  participationTokens as seedTokens,
-  type Claimable,
-  type ParticipationToken,
-} from '@/data/wallet'
-import { marketListings as seedListings, type MarketListing } from '@/data/listings'
-import {
-  recentActivity as seedRecent,
-  activityHistory as seedHistory,
-  type ActivityGroup,
-  type ActivityItem,
-} from '@/data/activity'
+import type { ActiveVault } from '@/data/vaults'
+import type { Position } from '@/data/positions'
+import type { Claimable, ParticipationToken } from '@/data/wallet'
+import type { MarketListing } from '@/data/listings'
+import type { ActivityGroup, ActivityItem } from '@/data/activity'
 import { formatUsd, formatUsdCompact, formatShortDate, formatMonthYear, parseUsd } from '@/lib/format'
 import type { CropKey } from '@/lib/icons'
 import {
   getPortfolio,
   getWallet,
   getActiveVaults,
+  getMarketListings,
+  getActivity,
   invest as investApi,
   claim as claimApi,
   addCash as addCashApi,
   withdraw as withdrawApi,
+  buy as buyApi,
+  sell as sellApi,
+  cancelListing as cancelListingApi,
   type ApiPosition,
   type ApiActiveVault,
+  type ApiMarketListing,
 } from '@/lib/api'
 
 const SEED_CASH_USD = 0
@@ -84,18 +80,26 @@ function toLocalActive(v: ApiActiveVault): ActiveVault {
   return { ...v, crop: v.crop as CropKey, status: v.status as ActiveVault['status'] }
 }
 
+// Empty baseline — all entities come from core-services via hydrate().
 function seed(): DemoEntities {
   return {
     cashUsd: SEED_CASH_USD,
     feesSol: SEED_FEES_SOL,
-    activeVaults: structuredClone(seedActiveVaults),
-    positions: structuredClone(seedPositions),
-    claimables: structuredClone(seedClaimables),
-    participationTokens: structuredClone(seedTokens),
-    listings: structuredClone(seedListings),
-    recentActivity: structuredClone(seedRecent),
-    activityHistory: structuredClone(seedHistory),
+    activeVaults: [],
+    positions: [],
+    claimables: [],
+    participationTokens: [],
+    listings: [],
+    recentActivity: [],
+    activityHistory: [],
   }
+}
+
+function toLocalListing(l: ApiMarketListing): MarketListing {
+  return { ...l, crop: l.crop as MarketListing['crop'] }
+}
+function toLocalActivity(a: import('@/lib/api').ApiActivityItem): ActivityItem {
+  return { ...a, action: a.action as ActivityItem['action'] }
 }
 
 function logActivity(state: DemoEntities, item: ActivityItem): Pick<DemoEntities, 'recentActivity' | 'activityHistory'> {
@@ -314,6 +318,9 @@ export const useDemoStore = create<DemoState>()(
           listings,
           ...logActivity(state, activityItem),
         })
+        buyApi(listingCode)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] buy:', e))
         return { ok: true, totalCostUsd: total }
       },
 
@@ -361,6 +368,9 @@ export const useDemoStore = create<DemoState>()(
           listings,
           ...logActivity(state, activityItem),
         })
+        sellApi(input.positionCode, input.askPriceUsd)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] sell:', e))
         return { ok: true }
       },
 
@@ -443,17 +453,22 @@ export const useDemoStore = create<DemoState>()(
           listings,
           ...logActivity(state, activityItem),
         })
+        cancelListingApi(listingCode)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] cancelListing:', e))
         return { ok: true }
       },
 
-      // Pull authoritative state from core-services (positions slice). Server
+      // Pull authoritative state from core-services. Server
       // owns cash/positions/activeVaults/claimables; the rest stays local.
       hydrate: async () => {
         try {
-          const [portfolio, wallet, active] = await Promise.all([
+          const [portfolio, wallet, active, listings, activity] = await Promise.all([
             getPortfolio(),
             getWallet(),
             getActiveVaults(),
+            getMarketListings(),
+            getActivity(),
           ])
           set({
             cashUsd: wallet.cashUsd,
@@ -461,6 +476,11 @@ export const useDemoStore = create<DemoState>()(
             positions: portfolio.positions.map(toLocalPosition),
             activeVaults: active.map(toLocalActive),
             claimables: wallet.claimables.map((c) => ({ ...c })),
+            listings: listings.map(toLocalListing),
+            recentActivity: activity.slice(0, 6).map(toLocalActivity),
+            activityHistory: activity.length
+              ? [{ month: 'Recent', items: activity.map(toLocalActivity) }]
+              : [],
           })
         } catch (err) {
           console.warn('[demo-store] hydrate:', err)
