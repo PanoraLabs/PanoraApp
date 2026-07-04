@@ -12,6 +12,7 @@ import {
   type ProfileRow,
 } from '@/lib/supabase'
 import { useAppStore, type StoredUser } from '@/store/app-store'
+import { useDemoStore } from '@/store/demo-store'
 import { setApiTokenGetter } from '@/lib/api'
 
 // Module-level guards so the fetch and wallet creation each happen once per
@@ -22,6 +23,7 @@ import { setApiTokenGetter } from '@/lib/api'
 let fetchedForId: string | null = null
 let fetchInFlightForId: string | null = null
 let creatingWalletForId: string | null = null
+let hydratedForId: string | null = null
 
 export type AppUser = StoredUser
 
@@ -84,6 +86,19 @@ export function useUser(): UseUserReturn {
     setSupabaseTokenGetter(tokenGetter)
     setApiTokenGetter(tokenGetter)
   }, [getAccessToken])
+
+  // Hydrate investor state (cash/positions/activeVaults/claimables) from
+  // core-services once per authenticated user. Module-guarded like the profile
+  // fetch so remounts don't refetch.
+  useEffect(() => {
+    if (!ready || !authenticated || !privyUser?.id) {
+      hydratedForId = null
+      return
+    }
+    if (hydratedForId === privyUser.id) return
+    hydratedForId = privyUser.id
+    useDemoStore.getState().hydrate()
+  }, [ready, authenticated, privyUser?.id])
 
   // Auto-create a Solana embedded wallet if Privy didn't on login. Guarded at
   // module scope so multiple useUser consumers don't each fire a creation.

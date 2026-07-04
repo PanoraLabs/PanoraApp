@@ -16,6 +16,18 @@ import {
   type ActivityItem,
 } from '@/data/activity'
 import { formatUsd, formatUsdCompact, formatShortDate, formatMonthYear, parseUsd } from '@/lib/format'
+import type { CropKey } from '@/lib/icons'
+import {
+  getPortfolio,
+  getWallet,
+  getActiveVaults,
+  invest as investApi,
+  claim as claimApi,
+  addCash as addCashApi,
+  withdraw as withdrawApi,
+  type ApiPosition,
+  type ApiActiveVault,
+} from '@/lib/api'
 
 const SEED_CASH_USD = 0
 const SEED_FEES_SOL = 0
@@ -59,7 +71,17 @@ interface DemoState extends DemoEntities {
   addCash: (input: CashInput) => { ok: true } | { ok: false; reason: string }
   withdraw: (input: CashInput) => { ok: true } | { ok: false; reason: string }
   cancelListing: (listingCode: string) => { ok: true } | { ok: false; reason: string }
+  hydrate: () => void
   reset: () => void
+}
+
+// Map server projections back to the local render types (crop/status are strings
+// server-side; the local types want the CropKey/VaultStatus unions).
+function toLocalPosition(p: ApiPosition): Position {
+  return { ...p, crop: p.crop as CropKey }
+}
+function toLocalActive(v: ApiActiveVault): ActiveVault {
+  return { ...v, crop: v.crop as CropKey, status: v.status as ActiveVault['status'] }
 }
 
 function seed(): DemoEntities {
@@ -191,6 +213,10 @@ export const useDemoStore = create<DemoState>()(
           participationTokens: tokens,
           ...logActivity(state, activityItem),
         })
+        // Write through to core-services, then reconcile with server truth.
+        investApi(input.vaultCode, input.amountUsd)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] invest:', e))
         return { ok: true }
       },
 
@@ -215,6 +241,9 @@ export const useDemoStore = create<DemoState>()(
           claimables,
           ...logActivity(state, activityItem),
         })
+        claimApi(claimableCode)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] claim:', e))
         return { ok: true, result: { amountUsd, code: target.code } }
       },
 
@@ -357,6 +386,9 @@ export const useDemoStore = create<DemoState>()(
           cashUsd: state.cashUsd + input.amountUsd,
           ...logActivity(state, activityItem),
         })
+        addCashApi(input.amountUsd)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] addCash:', e))
         return { ok: true }
       },
 
@@ -385,6 +417,9 @@ export const useDemoStore = create<DemoState>()(
           cashUsd: state.cashUsd - input.amountUsd,
           ...logActivity(state, activityItem),
         })
+        withdrawApi(input.amountUsd)
+          .then(() => get().hydrate())
+          .catch((e) => console.warn('[demo-store] withdraw:', e))
         return { ok: true }
       },
 
@@ -409,6 +444,27 @@ export const useDemoStore = create<DemoState>()(
           ...logActivity(state, activityItem),
         })
         return { ok: true }
+      },
+
+      // Pull authoritative state from core-services (positions slice). Server
+      // owns cash/positions/activeVaults/claimables; the rest stays local.
+      hydrate: async () => {
+        try {
+          const [portfolio, wallet, active] = await Promise.all([
+            getPortfolio(),
+            getWallet(),
+            getActiveVaults(),
+          ])
+          set({
+            cashUsd: wallet.cashUsd,
+            feesSol: wallet.feesSol,
+            positions: portfolio.positions.map(toLocalPosition),
+            activeVaults: active.map(toLocalActive),
+            claimables: wallet.claimables.map((c) => ({ ...c })),
+          })
+        } catch (err) {
+          console.warn('[demo-store] hydrate:', err)
+        }
       },
 
       reset: () => set(seed()),
