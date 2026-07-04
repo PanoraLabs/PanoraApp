@@ -32,18 +32,57 @@ async function req<T>(path: string): Promise<T> {
   return res.json() as Promise<T>
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
+async function send<T>(method: 'POST' | 'PUT', path: string, body: unknown): Promise<T> {
   const token = await getToken()
   const res = await fetch(`${API_URL}${path}`, {
-    method: 'POST',
+    method,
     headers: {
       'content-type': 'application/json',
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(body),
   })
-  if (!res.ok) throw new Error(`POST ${path} → ${res.status}`)
+  if (!res.ok) throw new Error(`${method} ${path} → ${res.status}`)
   return res.json() as Promise<T>
+}
+function post<T>(path: string, body: unknown): Promise<T> {
+  return send<T>('POST', path, body)
+}
+function put<T>(path: string, body: unknown): Promise<T> {
+  return send<T>('PUT', path, body)
+}
+
+// ── Profile (core-services /app/profile, Neon-backed) ──────────────────────
+
+export interface ProfileRow {
+  id: string
+  privy_id: string
+  email: string | null
+  name: string
+  wallet_address: string
+  avatar_url: string | null
+  created_at: string
+  updated_at: string
+}
+
+// Returns null when the user has no profile yet (404).
+export async function getProfile(): Promise<ProfileRow | null> {
+  const token = await getToken()
+  const res = await fetch(`${API_URL}/app/profile`, {
+    headers: token ? { authorization: `Bearer ${token}` } : {},
+  })
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`GET /app/profile → ${res.status}`)
+  return res.json() as Promise<ProfileRow>
+}
+
+export function putProfile(input: {
+  email?: string | null
+  name: string
+  walletAddress: string
+  avatarUrl?: string | null
+}): Promise<ProfileRow> {
+  return put<ProfileRow>('/app/profile', input)
 }
 
 export function getExploreVaults(): Promise<ApiExploreVault[]> {

@@ -4,16 +4,9 @@ import {
   useWallets as useSolanaWallets,
   useCreateWallet as useCreateSolanaWallet,
 } from '@privy-io/react-auth/solana'
-import {
-  fetchProfile,
-  setSupabaseTokenGetter,
-  updateProfileName,
-  upsertProfile,
-  type ProfileRow,
-} from '@/lib/supabase'
 import { useAppStore, type StoredUser } from '@/store/app-store'
 import { useDemoStore } from '@/store/demo-store'
-import { setApiTokenGetter } from '@/lib/api'
+import { getProfile, putProfile, setApiTokenGetter, type ProfileRow } from '@/lib/api'
 
 // Module-level guards so the fetch and wallet creation each happen once per
 // Privy id across the whole app, regardless of how many components mount
@@ -73,8 +66,7 @@ export function useUser(): UseUserReturn {
     return solana?.address ?? null
   }, [wallets, privyUser?.linkedAccounts])
 
-  // Wire Privy's JWT getter to Supabase (no-op for now — see lib/supabase.ts)
-  // and to the core-services API client (used for /app/* bearer auth).
+  // Wire Privy's JWT getter to the core-services API client (/app/* bearer auth).
   useEffect(() => {
     const tokenGetter = async () => {
       try {
@@ -83,7 +75,6 @@ export function useUser(): UseUserReturn {
         return null
       }
     }
-    setSupabaseTokenGetter(tokenGetter)
     setApiTokenGetter(tokenGetter)
   }, [getAccessToken])
 
@@ -130,7 +121,7 @@ export function useUser(): UseUserReturn {
     fetchInFlightForId = privyUser.id
     setIsLoadingProfile(true)
     const id = privyUser.id
-    fetchProfile(id)
+    getProfile()
       .then((row) => {
         fetchedForId = id
         setProfile(row ? rowToUser(row) : null)
@@ -153,13 +144,7 @@ export function useUser(): UseUserReturn {
       if (!privyUser?.id) throw new Error('Not authenticated')
       if (!walletAddress) throw new Error('Wallet not ready yet')
       const email = privyUser.email?.address ?? privyUser.google?.email ?? null
-      const row = await upsertProfile({
-        privyId: privyUser.id,
-        email,
-        name,
-        walletAddress,
-        avatarUrl: null,
-      })
+      const row = await putProfile({ email, name, walletAddress, avatarUrl: null })
       setProfile(rowToUser(row))
     },
     [privyUser?.id, privyUser?.email?.address, privyUser?.google?.email, walletAddress, setProfile]
@@ -168,10 +153,13 @@ export function useUser(): UseUserReturn {
   const updateName = useCallback(
     async (name: string) => {
       if (!privyUser?.id) throw new Error('Not authenticated')
-      const row = await updateProfileName(privyUser.id, name)
+      const wallet = walletAddress ?? profile?.walletAddress
+      if (!wallet) throw new Error('Wallet not ready yet')
+      const email = privyUser.email?.address ?? privyUser.google?.email ?? profile?.email ?? null
+      const row = await putProfile({ email, name, walletAddress: wallet, avatarUrl: profile?.avatarUrl ?? null })
       setProfile(rowToUser(row))
     },
-    [privyUser?.id, setProfile]
+    [privyUser?.id, privyUser?.email?.address, privyUser?.google?.email, walletAddress, profile, setProfile]
   )
 
   const signOut = useCallback(async () => {

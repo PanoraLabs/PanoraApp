@@ -8,9 +8,4 @@ function required(key: string, value: string | undefined): string {
 }
 
 export const PRIVY_APP_ID = required('VITE_PRIVY_APP_ID', import.meta.env.VITE_PRIVY_APP_ID)
-export const SUPABASE_URL = required('VITE_SUPABASE_URL', import.meta.env.VITE_SUPABASE_URL)
-export const SUPABASE_ANON_KEY = required(
-  'VITE_SUPABASE_ANON_KEY',
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-)
 export const API_URL = required('VITE_API_URL', import.meta.env.VITE_API_URL)
