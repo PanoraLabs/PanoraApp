@@ -4,12 +4,6 @@ export interface HomeStat {
   sub: string
 }
 
-export const homeStats: HomeStat[] = [
-  { val: '$0', label: 'Invested', sub: '0 vaults' },
-  { val: '0%', label: 'Avg Return', sub: 'per year' },
-  { val: '$0', label: 'Total Profit', sub: 'this year' },
-]
-
 export interface IoTReading {
   temp: string
   rh: string
@@ -35,13 +29,15 @@ export interface UserProfile {
   gainAmount: string
 }
 
+// Neutral defaults — the real identity comes from the authed Privy user; the
+// numeric fields are overwritten by usePortfolioSummary.
 export const userProfile: UserProfile = {
   greeting: 'Good morning,',
-  name: 'Agung Wibowo',
-  initials: 'AW',
+  name: '',
+  initials: '',
   totalPortfolioValue: 0,
   claimableValue: 0,
-  claimableSource: 'From your Cacao Flores harvest',
+  claimableSource: 'Invest in a vault to start earning',
   gainPercent: 0,
   gainAmount: '+$0 this month',
 }

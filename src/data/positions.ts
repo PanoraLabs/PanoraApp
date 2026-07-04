@@ -19,12 +19,8 @@ export interface PortfolioAllocation {
   label: string
 }
 
-// Fallback shown only when the user has no investments yet.
-export const portfolioAllocations: PortfolioAllocation[] = [
-  { color: '#5DBB7A', label: 'Greenhouse —' },
-  { color: '#C8961E', label: 'Coffee & Spice —' },
-  { color: 'rgba(255,255,255,0.3)', label: 'Grains —' },
-]
+// Empty until the user has investments — allocations come from live positions.
+export const portfolioAllocations: PortfolioAllocation[] = []
 
 export type MilestoneState = 'done' | 'pending' | 'upcoming'
 
@@ -35,23 +31,4 @@ export interface Milestone {
   sub: string
 }
 
-export const portfolioMilestones: Milestone[] = [
-  {
-    state: 'done',
-    label: '1',
-    title: 'Seeds & setup paid',
-    sub: 'Apr 2 · $0 sent to farmer',
-  },
-  {
-    state: 'pending',
-    label: '2',
-    title: 'Mid-season check',
-    sub: 'Waiting for farm verification',
-  },
-  {
-    state: 'upcoming',
-    label: '3',
-    title: 'Harvest & shipping',
-    sub: 'Estimated Jun 28',
-  },
-]
+export const portfolioMilestones: Milestone[] = []
